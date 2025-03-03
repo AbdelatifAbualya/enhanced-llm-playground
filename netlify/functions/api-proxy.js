@@ -1,35 +1,57 @@
-// netlify/functions/api-proxy.js
+// Netlify Function to securely proxy requests to Fireworks.ai
+const fetch = require('node-fetch');
+
 exports.handler = async function(event, context) {
+  // Handle OPTIONS request for CORS
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
       body: JSON.stringify({ error: 'Method Not Allowed' }),
-      headers: { 'Content-Type': 'application/json', 'Allow': 'POST' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Allow': 'POST'
+      }
     };
   }
 
   try {
+    // Get API key from environment variable
     const API_KEY = process.env.FIREWORKS_API_KEY;
+    
     if (!API_KEY) {
-      console.error('No API key found');
+      console.log("ERROR: API key is missing");
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'API key not configured' }),
-        headers: { 'Content-Type': 'application/json' }
+        body: JSON.stringify({ error: 'API key not configured on server' }),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
       };
     }
 
-    if (!event.body) {
-      console.error('No request body provided');
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Request body is required' }),
-        headers: { 'Content-Type': 'application/json' }
-      };
-    }
-
+    // Log request info (non-sensitive)
+    console.log("Received request");
+    
+    // Parse the request body
     const requestBody = JSON.parse(event.body);
-
+    console.log(`Model requested: ${requestBody.model || 'not specified'}`);
+    
+    // Forward the request to Fireworks.ai
     const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -39,27 +61,32 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(requestBody)
     });
 
+    console.log(`Fireworks API response status: ${response.status}`);
+    
+    // Get the response data
     const data = await response.json();
-    if (!response.ok) {
-      console.error('Fireworks.ai error:', { status: response.status, data });
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: 'API request failed', details: data }),
-        headers: { 'Content-Type': 'application/json' }
-      };
-    }
-
+    
+    // Return the response from Fireworks.ai
     return {
-      statusCode: 200,
+      statusCode: response.status,
       body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     };
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Function error:', error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error', message: error.message }),
-      headers: { 'Content-Type': 'application/json' }
+      body: JSON.stringify({ 
+        error: 'Internal Server Error', 
+        message: error.message
+      }),
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     };
   }
 };
