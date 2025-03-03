@@ -1,4 +1,50 @@
-<!DOCTYPE html>
+/***********************
+     * Export Research Data
+     ***********************/
+    function exportResearchData() {
+      const allThreads = [...threads];
+      let csvContent = "thread_id,message_index,reasoning_method,word_limit,word_count,rating,timestamp\n";
+      
+      allThreads.forEach(thread => {
+        let messageIndex = 0;
+        thread.messages.forEach(msg => {
+          // Only include bot messages that aren't placeholders
+          if (msg.sender === "bot" && !msg.isPlaceholder) {
+            const threadId = thread.id;
+            
+            // Parse reasoning method and word limit
+            let reasoningMethod = msg.reasoningMethod || REASONING_METHOD.toUpperCase();
+            let wordLimit = "";
+            
+            if (reasoningMethod.includes("COD-")) {
+              const parts = reasoningMethod.split("-");
+              reasoningMethod = "COD";
+              wordLimit = parts[1] || "";
+            }
+            
+            const wordCount = msg.wordCount || 0;
+            const rating = msg.rating !== null ? msg.rating : "";
+            const timestamp = msg.timestamp.toISOString();
+            
+            csvContent += `${threadId},${messageIndex},${reasoningMethod},${wordLimit},${wordCount},${rating},${timestamp}\n`;
+          }
+          messageIndex++;
+        });
+      });
+      
+      // Create downloadable file
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `llm_research_data_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showNotification("Research data exported to CSV");
+    }<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -979,6 +1025,9 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       updateThreadList();
       renderCurrentThreadMessages();
       
+      // Save to localStorage
+      saveThreadsToLocalStorage();
+      
       // Show status notification
       showNotification("New thread created");
     }
@@ -1013,6 +1062,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
         updateThreadList();
         renderCurrentThreadMessages();
+        
+        // Save to localStorage
+        saveThreadsToLocalStorage();
+        
         showNotification("Thread deleted");
       }
     }
@@ -1069,7 +1122,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         // Add word count info for bot messages
         let headerInfo = prefix;
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+          if (msg.rating !== null) {
+            headerInfo += ` - Rating: ${msg.rating}/10`;
+          }
+          headerInfo += `]`;
         }
         
         content += `${headerInfo}:\n`;
@@ -1146,7 +1203,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         // Add word count info for bot messages
         let sender = msg.sender.toUpperCase() + ":";
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+          if (msg.rating !== null) {
+            sender += ` - Rating: ${msg.rating}/10`;
+          }
+          sender += `]`;
         }
         
         doc.text(sender, leftMargin, yPos);
@@ -1196,45 +1257,128 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Rendering Messages
+     * Rating System
      ***********************/
-    function renderCurrentThreadMessages() {
-      const chatMessagesDiv = document.getElementById("chatMessages");
-      chatMessagesDiv.innerHTML = "";
+    function createRatingSystem(messageDiv, msgIndex) {
       const thread = threads.find(t => t.id === currentThreadId);
-      if (thread) {
-        thread.messages.forEach(msg => {
-          const messageDiv = document.createElement("div");
-          messageDiv.classList.add("message", msg.sender);
-          if (msg.isPlaceholder) {
-            messageDiv.classList.add("placeholder");
-          }
-
-          const timestampStr = msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const timestampEl = document.createElement("small");
-          timestampEl.textContent = timestampStr;
-          timestampEl.style.color = "#aaa";
-          timestampEl.style.display = "block";
-          timestampEl.style.marginBottom = "0.5rem";
-          messageDiv.appendChild(timestampEl);
-
-          const contentEl = document.createElement("div");
-          contentEl.innerHTML = transformMessage(msg.content);
-          messageDiv.appendChild(contentEl);
-          
-          // Add word count badge for bot messages (except placeholders)
-          if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-            const wordCountBadge = document.createElement("div");
-            wordCountBadge.className = "word-count-badge";
-            wordCountBadge.textContent = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
-            messageDiv.appendChild(wordCountBadge);
-          }
-
-          chatMessagesDiv.appendChild(messageDiv);
-        });
-        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+      if (!thread || !thread.messages[msgIndex]) return;
+      
+      const msg = thread.messages[msgIndex];
+      
+      // Only add rating system to bot messages (that aren't placeholders)
+      if (msg.sender !== "bot" || msg.isPlaceholder) return;
+      
+      // Create rating container
+      const ratingContainer = document.createElement("div");
+      ratingContainer.className = "rating-container";
+      
+      // If already rated, show the rating
+      if (msg.rating !== null) {
+        const ratingDisplay = document.createElement("div");
+        ratingDisplay.className = "rating-submitted";
+        ratingDisplay.textContent = `Response rated: ${msg.rating}/10`;
+        ratingContainer.appendChild(ratingDisplay);
+        messageDiv.appendChild(ratingContainer);
+        return;
       }
-      addCodeCopyButtons();
+      
+      // Create rating label
+      const ratingLabel = document.createElement("div");
+      ratingLabel.className = "rating-label";
+      ratingLabel.textContent = "Rate this response (1-10):";
+      ratingContainer.appendChild(ratingLabel);
+      
+      // Create stars container
+      const starsContainer = document.createElement("div");
+      starsContainer.className = "rating-stars";
+      
+      // Create 10 rating options
+      let selectedRating = 0;
+      for (let i = 1; i <= 10; i++) {
+        const star = document.createElement("div");
+        star.className = "rating-star";
+        star.textContent = i;
+        star.dataset.value = i;
+        
+        star.addEventListener("click", function() {
+          // Clear all selected stars
+          document.querySelectorAll(`#star-${msgIndex}-${i}`).forEach(s => {
+            s.classList.remove("selected");
+          });
+          
+          // Select stars up to the clicked one
+          for (let j = 1; j <= i; j++) {
+            document.querySelectorAll(`#star-${msgIndex}-${j}`).forEach(s => {
+              s.classList.add("selected");
+            });
+          }
+          
+          selectedRating = i;
+        });
+        
+        // Add unique ID for targeting
+        star.id = `star-${msgIndex}-${i}`;
+        
+        starsContainer.appendChild(star);
+      }
+      ratingContainer.appendChild(starsContainer);
+      
+      // Create submit button
+      const submitBtn = document.createElement("button");
+      submitBtn.className = "rating-submit";
+      submitBtn.textContent = "Submit Rating";
+      submitBtn.addEventListener("click", function() {
+        if (selectedRating > 0) {
+          // Save rating to the message
+          thread.messages[msgIndex].rating = selectedRating;
+          
+          // Remove rating system and show confirmation
+          ratingContainer.innerHTML = "";
+          const ratingDisplay = document.createElement("div");
+          ratingDisplay.className = "rating-submitted";
+          ratingDisplay.textContent = `Response rated: ${selectedRating}/10`;
+          ratingContainer.appendChild(ratingDisplay);
+          
+          // Also save to localStorage
+          saveThreadsToLocalStorage();
+          
+          // Show notification
+          showNotification(`Rating of ${selectedRating}/10 saved for research`);
+        } else {
+          showNotification("Please select a rating first");
+        }
+      });
+      ratingContainer.appendChild(submitBtn);
+      
+      messageDiv.appendChild(ratingContainer);
+    }
+    
+    function saveThreadsToLocalStorage() {
+      try {
+        localStorage.setItem("threads", JSON.stringify(threads));
+      } catch (err) {
+        console.error("Error saving threads to localStorage:", err);
+      }
+    }
+    
+    function loadThreadsFromLocalStorage() {
+      try {
+        const savedThreads = localStorage.getItem("threads");
+        if (savedThreads) {
+          threads = JSON.parse(savedThreads);
+          
+          // Convert date strings back to Date objects
+          threads.forEach(thread => {
+            thread.messages.forEach(msg => {
+              if (msg.timestamp) {
+                msg.timestamp = new Date(msg.timestamp);
+              }
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Error loading threads from localStorage:", err);
+      }
     }
 
     function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
@@ -1244,9 +1388,19 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           content,
           sender,
           isPlaceholder,
-          timestamp: new Date()
+          timestamp: new Date(),
+          wordCount: sender === "bot" && !isPlaceholder ? countWords(content) : undefined,
+          reasoningMethod: sender === "bot" && !isPlaceholder ? 
+            (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
+            undefined,
+          rating: null
         });
         renderCurrentThreadMessages();
+        
+        // Save to localStorage if not a placeholder
+        if (!isPlaceholder) {
+          saveThreadsToLocalStorage();
+        }
       }
     }
 
