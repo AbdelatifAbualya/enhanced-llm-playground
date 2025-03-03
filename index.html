@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Enhanced LLM Playground (Chain of Thought + Draft)</title>
+  <title>LLM Playground (COT vs COD)</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -508,49 +509,6 @@
       cursor: help;
     }
     
-    /* Range slider styles for numerical inputs */
-    .range-container {
-      margin-bottom: 12px;
-    }
-    
-    .range-container .range-value {
-      display: inline-block;
-      width: 50px;
-      text-align: center;
-      background: #333;
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin-left: 8px;
-    }
-    
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #444;
-      border-radius: 3px;
-      outline: none;
-      margin: 10px 0;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      background: #4a8cff;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    
-    input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      background: #4a8cff;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    
     /* Better visibility for section headers */
     .settings-section-header {
       font-size: 1.1rem;
@@ -559,6 +517,13 @@
       padding-bottom: 8px;
       border-bottom: 1px solid #444;
       color: #eee;
+    }
+
+    /* COD Word Limit dropdown */
+    .cod-options {
+      margin-top: 15px;
+      margin-left: 24px;
+      display: none;
     }
     
     /* Status notification */
@@ -703,7 +668,7 @@
     <!-- Chat Area -->
     <div class="chat-container">
       <div class="chat-header">
-        <h1 id="pageTitle">Enhanced LLM Playground (Chain of Thought + Draft)</h1>
+        <h1 id="pageTitle">LLM Playground (COT vs COD)</h1>
         <div>
           <span id="currentModelDisplay" class="current-model-display">Model not set</span>
           <button class="settings-btn" id="openSettings">Settings ⚙️</button>
@@ -766,65 +731,26 @@
             </div>
             
             <div class="radio-option">
-              <input type="radio" id="codReasoning" name="reasoningMethod" value="cod">
+              <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked>
               <label for="codReasoning">Chain of Draft (CoD)</label>
               <div class="tooltip">?
-                <span class="tooltiptext">Uses minimal words per step (≤5 words) to reduce token usage while maintaining reasoning quality.</span>
+                <span class="tooltiptext">Uses minimal words per step to reduce token usage while maintaining reasoning quality.</span>
               </div>
-            </div>
-            
-            <div class="radio-option">
-              <input type="radio" id="hybridReasoning" name="reasoningMethod" value="hybrid">
-              <label for="hybridReasoning">Hybrid (CoT+CoD)</label>
-              <div class="tooltip">?
-                <span class="tooltiptext">Combines Chain of Thought structure with Chain of Draft efficiency. Best for complex reasoning with token efficiency.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Domain-specific settings -->
-        <div class="settings-section-header">Domain-Specific Settings</div>
-        <div class="feature-section">
-          <div class="feature-header">
-            <input type="checkbox" id="autoDetectDomain" checked>
-            <label for="autoDetectDomain">Auto-detect query domain</label>
-            <div class="tooltip">?
-              <span class="tooltiptext">Automatically detect if a query is code-related, math-related, etc. and apply appropriate reasoning strategies.</span>
             </div>
           </div>
           
-          <div class="feature-options">
-            <div class="settings-row">
-              <div class="settings-column">
-                <div class="option-label">Code Optimization:</div>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="codeOptimizationEnabled" checked>
-                  <label for="codeOptimizationEnabled">Enable for code queries</label>
-                </div>
-              </div>
-              
-              <div class="settings-column">
-                <div class="option-label">Math Reasoning:</div>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="mathReasoningEnabled" checked>
-                  <label for="mathReasoningEnabled">Enable for math queries</label>
-                </div>
-              </div>
-            </div>
+          <!-- COD Word Limit options -->
+          <div id="codOptions" class="cod-options">
+            <label for="codWordLimit">Word limit per step:</label>
+            <select id="codWordLimit">
+              <option value="5">5 words (Default)</option>
+              <option value="10">10 words</option>
+              <option value="15">15 words</option>
+              <option value="17">17 words</option>
+              <option value="21">21 words</option>
+              <option value="30">30 words</option>
+            </select>
           </div>
-        </div>
-        
-        <!-- Reasoning balance -->
-        <div class="settings-section-header">Reasoning Balance</div>
-        <div class="option-label">Verbosity vs Conciseness:</div>
-        <div class="range-container">
-          <input type="range" id="reasoningVerbosityBalance" min="0" max="100" value="50" step="5">
-          <span id="verbosityValue" class="range-value">50%</span>
-        </div>
-        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 20px; display: flex; justify-content: space-between;">
-          <span>More concise</span>
-          <span>More verbose</span>
         </div>
         
         <!-- Custom prompt editing -->
@@ -834,9 +760,6 @@
           <select id="customPromptSelect">
             <option value="cot">Chain of Thought</option>
             <option value="cod">Chain of Draft</option>
-            <option value="hybrid">Hybrid (CoT+CoD)</option>
-            <option value="code">Code Optimization</option>
-            <option value="math">Math Reasoning</option>
           </select>
           <textarea id="customPromptEditor"></textarea>
           <div class="prompt-reset" id="resetCustomPrompt">Reset to default</div>
@@ -909,15 +832,10 @@
     const API_PROXY_URL = "/.netlify/functions/api-proxy";
     
     // Reasoning Method
-    let REASONING_METHOD = "cod"; // Options: "standard", "cot", "cod", "hybrid"
+    let REASONING_METHOD = "cod"; // Options: "standard", "cot", "cod"
     
-    // Auto-detect settings
-    let AUTO_DETECT_DOMAIN = true;
-    let CODE_OPTIMIZATION_ENABLED = true;
-    let MATH_REASONING_ENABLED = true;
-    
-    // Balance settings
-    let REASONING_VERBOSITY = 50; // 0 = ultra concise, 100 = very verbose
+    // COD Word Limit
+    let COD_WORD_LIMIT = 5;
     
     // Prompts for different reasoning methods
     let PROMPTS = {
@@ -931,89 +849,7 @@ Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollip
 A: Initial: 20 lollipops. Remaining: 12 lollipops. Difference: 20 - 12. Calculate: 8 lollipops. #### 8 lollipops
 
 Q: If a fabric store received 45 yards of cotton material, and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
-A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`,
-      
-      hybrid: `Think step by step to solve this problem, but keep each step concise (10 words or less). Show your reasoning and conclude with your final answer after ####.
-
-Examples:
-Q: A store has 120 items. They sold 1/3 of their inventory, then received a shipment of 20 more items. How many items do they have now?
-A: 
-- Initial: 120 items
-- Sold: 1/3 of 120 = 40 items
-- Remaining: 120 - 40 = 80 items
-- New shipment: 20 items
-- Final count: 80 + 20 = 100 items
-#### They have 100 items now.
-
-Q: A train travels 120 miles at 60 mph, then another 150 miles at 75 mph. What is the average speed for the entire journey?
-A:
-- First leg: 120 miles at 60 mph = 2 hours
-- Second leg: 150 miles at 75 mph = 2 hours
-- Total distance: 120 + 150 = 270 miles
-- Total time: 2 + 2 = 4 hours
-- Average speed: 270 ÷ 4 = 67.5 mph
-#### The average speed is 67.5 mph.`,
-      
-      code: `When solving coding problems, follow these steps:
-1. First identify the core algorithm/approach in a brief one-line comment
-2. List key data structures needed (1-2 words each)
-3. Outline core functions needed (just signatures)
-4. Note edge cases to handle (keywords only)
-5. Finally, write the complete solution code
-
-Limit each planning step to essential information only. Keep comments minimal.
-
-Example:
-Q: Write a function to find the longest palindromic substring in a given string.
-A: 
-// Expand from center approach
-// Data: string, indices
-// Function: expandAroundCenter(s, left, right)
-// Edge: empty string, single char
-function longestPalindrome(s) {
-    if (!s || s.length < 1) return "";
-    let start = 0, end = 0;
-    
-    function expandAroundCenter(s, left, right) {
-        while (left >= 0 && right < s.length && s[left] === s[right]) {
-            left--;
-            right++;
-        }
-        return right - left - 1;
-    }
-    
-    for (let i = 0; i < s.length; i++) {
-        let len1 = expandAroundCenter(s, i, i);
-        let len2 = expandAroundCenter(s, i, i + 1);
-        let len = Math.max(len1, len2);
-        
-        if (len > end - start) {
-            start = i - Math.floor((len - 1) / 2);
-            end = i + Math.floor(len / 2);
-        }
-    }
-    
-    return s.substring(start, end + 1);
-}
-#### function longestPalindrome(s) {...}`,
-      
-      math: `For mathematical problems, use these concise steps:
-1. Identify the given values and variables
-2. State the formula or approach needed
-3. Work through calculations step by step
-4. Simplify the result to its final form
-5. Provide your final answer after ####
-
-Example:
-Q: Calculate the surface area of a cylinder with radius 5cm and height 10cm.
-A:
-- Given: r = 5cm, h = 10cm
-- Formula: SA = 2πr² + 2πrh
-- Top/bottom: 2πr² = 2π(5)² = 2π(25) = 50π
-- Side: 2πrh = 2π(5)(10) = 100π
-- Total: 50π + 100π = 150π
-- Final: 150π ≈ 471.2cm²
-#### The surface area is 150π cm² or approximately 471.2 cm²`
+A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`
     };
     
     // Default generation parameters
@@ -1049,10 +885,7 @@ A:
             reasoningBadge = '<span class="reasoning-badge" style="background-color: #2c6b9c;">CoT</span>';
             break;
           case "cod":
-            reasoningBadge = '<span class="reasoning-badge" style="background-color: #2c6b9c;">CoD</span>';
-            break;
-          case "hybrid":
-            reasoningBadge = '<span class="reasoning-badge" style="background-color: #2c6b9c;">CoT+CoD</span>';
+            reasoningBadge = `<span class="reasoning-badge" style="background-color: #2c6b9c;">CoD-${COD_WORD_LIMIT}</span>`;
             break;
         }
         
@@ -1156,7 +989,11 @@ A:
       const thread = threads.find(t => t.id === currentThreadId);
       if (!thread) return;
 
-      let content = `Model: ${MODEL_NAME_DISPLAY} (${REASONING_METHOD.toUpperCase()})\n\n`;
+      let content = `Model: ${MODEL_NAME_DISPLAY} (${REASONING_METHOD.toUpperCase()}`;
+      if (REASONING_METHOD === "cod") {
+        content += `-${COD_WORD_LIMIT}`;
+      }
+      content += `)\n\n`;
 
       thread.messages.forEach(msg => {
         const prefix = msg.sender.toUpperCase();
@@ -1217,7 +1054,12 @@ A:
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.text(`Model: ${MODEL_NAME_DISPLAY} (${REASONING_METHOD.toUpperCase()})`, leftMargin, yPos);
+      let modelInfo = `Model: ${MODEL_NAME_DISPLAY} (${REASONING_METHOD.toUpperCase()}`;
+      if (REASONING_METHOD === "cod") {
+        modelInfo += `-${COD_WORD_LIMIT}`;
+      }
+      modelInfo += `)`;
+      doc.text(modelInfo, leftMargin, yPos);
       yPos += 20;
       doc.text(thread.name, leftMargin, yPos);
       yPos += 20;
@@ -1320,94 +1162,6 @@ A:
     }
 
     /***********************
-     * Domain Detection
-     ***********************/
-    function detectQueryDomain(query) {
-      // Convert to lowercase for case-insensitive matching
-      query = query.toLowerCase();
-      
-      // Detect if it's a code query
-      if (CODE_OPTIMIZATION_ENABLED && isCodeQuery(query)) {
-        return "code";
-      }
-      
-      // Detect if it's a math query
-      if (MATH_REASONING_ENABLED && isMathQuery(query)) {
-        return "math";
-      }
-      
-      // Default domain
-      return "general";
-    }
-    
-    function isCodeQuery(query) {
-      const codeKeywords = [
-        'function', 'code', 'algorithm', 'implement', 'programming',
-        'javascript', 'python', 'java', 'c#', 'c++', 'go', 'rust',
-        'typescript', 'react', 'node', 'express', 'api', 'backend',
-        'frontend', 'class', 'write a', 'create a', 'build a',
-        'develop', 'application', 'script', 'program', 'module'
-      ];
-      
-      query = query.toLowerCase();
-      
-      // Check for code keywords
-      for (const keyword of codeKeywords) {
-        if (query.includes(keyword)) {
-          return true;
-        }
-      }
-      
-      // Check for code patterns
-      if (query.includes('function') && query.includes('(') && query.includes(')')) {
-        return true;
-      }
-      
-      return false;
-    }
-    
-    function isMathQuery(query) {
-      const mathKeywords = [
-        'solve', 'calculate', 'compute', 'equation', 'formula',
-        'math', 'algebra', 'geometry', 'calculus', 'theorem',
-        'function', 'logarithm', 'exponential', 'derivative',
-        'integral', 'matrix', 'vector', 'probability', 'statistics'
-      ];
-      
-      query = query.toLowerCase();
-      
-      // Check for math keywords
-      for (const keyword of mathKeywords) {
-        if (query.includes(keyword)) {
-          return true;
-        }
-      }
-      
-      // Check for mathematical symbols
-      const mathSymbols = ['+', '-', '*', '/', '=', '<', '>', '^', '√', '∫', '∑'];
-      let symbolCount = 0;
-      
-      for (const symbol of mathSymbols) {
-        if (query.includes(symbol)) {
-          symbolCount++;
-        }
-      }
-      
-      // If there are at least 2 math symbols, likely a math query
-      if (symbolCount >= 2) {
-        return true;
-      }
-      
-      // Check for numerical patterns (e.g., "what is 5 + 3?")
-      const numberPattern = /\d+\s*[\+\-\*\/\=]\s*\d+/;
-      if (numberPattern.test(query)) {
-        return true;
-      }
-      
-      return false;
-    }
-
-    /***********************
      * Build Messages Array for Chat Completions
      ***********************/
     function buildMessagesForChat() {
@@ -1416,50 +1170,16 @@ A:
       
       const messages = [];
       
-      // Get the last user message to detect domain if auto-detect is enabled
-      const lastUserMessage = thread.messages
-        .filter(msg => msg.sender === "user" && !msg.isPlaceholder)
-        .pop();
-      
       let systemPrompt = "";
       
       // If we have a reasoning method other than standard, add the system prompt
       if (REASONING_METHOD !== "standard") {
-        // Determine which prompt to use based on auto-detection and reasoning method
-        if (AUTO_DETECT_DOMAIN && lastUserMessage) {
-          const domain = detectQueryDomain(lastUserMessage.content);
-          
-          if (domain === "code" && CODE_OPTIMIZATION_ENABLED) {
-            systemPrompt = PROMPTS.code;
-          } else if (domain === "math" && MATH_REASONING_ENABLED) {
-            systemPrompt = PROMPTS.math;
-          } else {
-            systemPrompt = PROMPTS[REASONING_METHOD];
-          }
-        } else {
-          // Just use the standard prompt for the selected reasoning method
-          systemPrompt = PROMPTS[REASONING_METHOD];
-        }
+        // Use the selected reasoning method prompt
+        systemPrompt = PROMPTS[REASONING_METHOD];
         
-        // Adjust system prompt based on verbosity setting
-        if (REASONING_VERBOSITY !== 50) {
-          if (REASONING_METHOD === "cod" || REASONING_METHOD === "hybrid") {
-            // Adjust word limits based on verbosity
-            let wordLimit;
-            if (REASONING_VERBOSITY < 25) {
-              wordLimit = 3;
-            } else if (REASONING_VERBOSITY < 50) {
-              wordLimit = 5;
-            } else if (REASONING_VERBOSITY < 75) {
-              wordLimit = 10;
-            } else {
-              wordLimit = 15;
-            }
-            
-            // Replace word limits in prompts
-            systemPrompt = systemPrompt.replace(/\b\d+ words? at most\b/, `${wordLimit} words at most`);
-            systemPrompt = systemPrompt.replace(/\b\d+ words? or less\b/, `${wordLimit} words or less`);
-          }
+        // If it's COD, update the word limit
+        if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
+          systemPrompt = systemPrompt.replace(/with 5 words at most/, `with ${COD_WORD_LIMIT} words at most`);
         }
         
         messages.push({
@@ -1655,6 +1375,36 @@ A:
       });
     }
     
+    // Setup COD options display
+    function setupCODOptions() {
+      const reasoningRadios = document.getElementsByName('reasoningMethod');
+      const codOptions = document.getElementById('codOptions');
+      
+      // Initial state
+      if (REASONING_METHOD === 'cod') {
+        codOptions.style.display = 'block';
+      } else {
+        codOptions.style.display = 'none';
+      }
+      
+      // Update when reasoning method changes
+      reasoningRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          if (radio.value === 'cod' && radio.checked) {
+            codOptions.style.display = 'block';
+          } else {
+            codOptions.style.display = 'none';
+          }
+        });
+      });
+      
+      // Setup word limit dropdown
+      const wordLimitSelect = document.getElementById('codWordLimit');
+      wordLimitSelect.addEventListener('change', () => {
+        COD_WORD_LIMIT = parseInt(wordLimitSelect.value);
+      });
+    }
+    
     // Custom prompt handling
     function setupCustomPromptEditor() {
       const promptSelector = document.getElementById('customPromptSelect');
@@ -1691,89 +1441,7 @@ Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollip
 A: Initial: 20 lollipops. Remaining: 12 lollipops. Difference: 20 - 12. Calculate: 8 lollipops. #### 8 lollipops
 
 Q: If a fabric store received 45 yards of cotton material, and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
-A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`,
-          
-          hybrid: `Think step by step to solve this problem, but keep each step concise (10 words or less). Show your reasoning and conclude with your final answer after ####.
-
-Examples:
-Q: A store has 120 items. They sold 1/3 of their inventory, then received a shipment of 20 more items. How many items do they have now?
-A: 
-- Initial: 120 items
-- Sold: 1/3 of 120 = 40 items
-- Remaining: 120 - 40 = 80 items
-- New shipment: 20 items
-- Final count: 80 + 20 = 100 items
-#### They have 100 items now.
-
-Q: A train travels 120 miles at 60 mph, then another 150 miles at 75 mph. What is the average speed for the entire journey?
-A:
-- First leg: 120 miles at 60 mph = 2 hours
-- Second leg: 150 miles at 75 mph = 2 hours
-- Total distance: 120 + 150 = 270 miles
-- Total time: 2 + 2 = 4 hours
-- Average speed: 270 ÷ 4 = 67.5 mph
-#### The average speed is 67.5 mph.`,
-          
-          code: `When solving coding problems, follow these steps:
-1. First identify the core algorithm/approach in a brief one-line comment
-2. List key data structures needed (1-2 words each)
-3. Outline core functions needed (just signatures)
-4. Note edge cases to handle (keywords only)
-5. Finally, write the complete solution code
-
-Limit each planning step to essential information only. Keep comments minimal.
-
-Example:
-Q: Write a function to find the longest palindromic substring in a given string.
-A: 
-// Expand from center approach
-// Data: string, indices
-// Function: expandAroundCenter(s, left, right)
-// Edge: empty string, single char
-function longestPalindrome(s) {
-    if (!s || s.length < 1) return "";
-    let start = 0, end = 0;
-    
-    function expandAroundCenter(s, left, right) {
-        while (left >= 0 && right < s.length && s[left] === s[right]) {
-            left--;
-            right++;
-        }
-        return right - left - 1;
-    }
-    
-    for (let i = 0; i < s.length; i++) {
-        let len1 = expandAroundCenter(s, i, i);
-        let len2 = expandAroundCenter(s, i, i + 1);
-        let len = Math.max(len1, len2);
-        
-        if (len > end - start) {
-            start = i - Math.floor((len - 1) / 2);
-            end = i + Math.floor(len / 2);
-        }
-    }
-    
-    return s.substring(start, end + 1);
-}
-#### function longestPalindrome(s) {...}`,
-          
-          math: `For mathematical problems, use these concise steps:
-1. Identify the given values and variables
-2. State the formula or approach needed
-3. Work through calculations step by step
-4. Simplify the result to its final form
-5. Provide your final answer after ####
-
-Example:
-Q: Calculate the surface area of a cylinder with radius 5cm and height 10cm.
-A:
-- Given: r = 5cm, h = 10cm
-- Formula: SA = 2πr² + 2πrh
-- Top/bottom: 2πr² = 2π(5)² = 2π(25) = 50π
-- Side: 2πrh = 2π(5)(10) = 100π
-- Total: 50π + 100π = 150π
-- Final: 150π ≈ 471.2cm²
-#### The surface area is 150π cm² or approximately 471.2 cm²`
+A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`
         };
         
         // Reset to default
@@ -1795,38 +1463,6 @@ A:
           });
         }
       });
-      
-      // Verbosity slider special handling
-      const verbositySlider = document.getElementById('reasoningVerbosityBalance');
-      verbositySlider.addEventListener('input', () => {
-        document.getElementById('verbosityValue').textContent = `${verbositySlider.value}%`;
-      });
-    }
-    
-    // Checkbox for auto-detect domain
-    function setupAutoDetectDomain() {
-      const autoDetectCheckbox = document.getElementById('autoDetectDomain');
-      const codeOptCheckbox = document.getElementById('codeOptimizationEnabled');
-      const mathReasoningCheckbox = document.getElementById('mathReasoningEnabled');
-      
-      // Update domain-specific settings when auto-detect changes
-      autoDetectCheckbox.addEventListener('change', () => {
-        const isEnabled = autoDetectCheckbox.checked;
-        codeOptCheckbox.disabled = !isEnabled;
-        mathReasoningCheckbox.disabled = !isEnabled;
-        
-        // Update global setting
-        AUTO_DETECT_DOMAIN = isEnabled;
-      });
-      
-      // Update global settings when domain-specific checkboxes change
-      codeOptCheckbox.addEventListener('change', () => {
-        CODE_OPTIMIZATION_ENABLED = codeOptCheckbox.checked;
-      });
-      
-      mathReasoningCheckbox.addEventListener('change', () => {
-        MATH_REASONING_ENABLED = mathReasoningCheckbox.checked;
-      });
     }
     
     function openSettingsModal() {
@@ -1836,14 +1472,8 @@ A:
       // Set reasoning method radio buttons
       document.getElementById(`${REASONING_METHOD}Reasoning`).checked = true;
       
-      // Set auto-detect domain checkbox
-      document.getElementById("autoDetectDomain").checked = AUTO_DETECT_DOMAIN;
-      document.getElementById("codeOptimizationEnabled").checked = CODE_OPTIMIZATION_ENABLED;
-      document.getElementById("mathReasoningEnabled").checked = MATH_REASONING_ENABLED;
-      
-      // Set the verbosity slider
-      document.getElementById("reasoningVerbosityBalance").value = REASONING_VERBOSITY;
-      document.getElementById("verbosityValue").textContent = `${REASONING_VERBOSITY}%`;
+      // Set COD word limit
+      document.getElementById("codWordLimit").value = COD_WORD_LIMIT.toString();
       
       // Set parameter sliders
       document.getElementById("temp").value = TEMPERATURE;
@@ -1886,13 +1516,10 @@ A:
         }
       }
       
-      // Save domain detection settings
-      AUTO_DETECT_DOMAIN = document.getElementById("autoDetectDomain").checked;
-      CODE_OPTIMIZATION_ENABLED = document.getElementById("codeOptimizationEnabled").checked;
-      MATH_REASONING_ENABLED = document.getElementById("mathReasoningEnabled").checked;
-      
-      // Save verbosity setting
-      REASONING_VERBOSITY = parseInt(document.getElementById("reasoningVerbosityBalance").value);
+      // Save COD word limit if applicable
+      if (REASONING_METHOD === "cod") {
+        COD_WORD_LIMIT = parseInt(document.getElementById("codWordLimit").value);
+      }
       
       // Save generation parameters
       TEMPERATURE = parseFloat(document.getElementById("temp").value);
@@ -1908,10 +1535,7 @@ A:
       // Save settings to localStorage
       localStorage.setItem("modelName", MODEL_NAME);
       localStorage.setItem("reasoningMethod", REASONING_METHOD);
-      localStorage.setItem("autoDetectDomain", AUTO_DETECT_DOMAIN.toString());
-      localStorage.setItem("codeOptimizationEnabled", CODE_OPTIMIZATION_ENABLED.toString());
-      localStorage.setItem("mathReasoningEnabled", MATH_REASONING_ENABLED.toString());
-      localStorage.setItem("reasoningVerbosity", REASONING_VERBOSITY.toString());
+      localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
       localStorage.setItem("temperature", TEMPERATURE.toString());
       localStorage.setItem("topP", TOP_P.toString());
       localStorage.setItem("topK", TOP_K.toString());
@@ -1970,9 +1594,9 @@ A:
       // Set up settings UI functionality
       setupTabNavigation();
       setupModelInput();
+      setupCODOptions();
       setupCustomPromptEditor();
       setupSliders();
-      setupAutoDetectDomain();
     }
 
     /***********************
@@ -1984,12 +1608,8 @@ A:
       
       REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
       
-      AUTO_DETECT_DOMAIN = localStorage.getItem("autoDetectDomain") === "true";
-      CODE_OPTIMIZATION_ENABLED = localStorage.getItem("codeOptimizationEnabled") === "true";
-      MATH_REASONING_ENABLED = localStorage.getItem("mathReasoningEnabled") === "true";
-      
-      const verbosity = localStorage.getItem("reasoningVerbosity");
-      if (verbosity) REASONING_VERBOSITY = parseInt(verbosity);
+      const codWordLimit = localStorage.getItem("codWordLimit");
+      if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
       
       // Load custom prompts if available
       const storedPrompts = localStorage.getItem("customPrompts");
