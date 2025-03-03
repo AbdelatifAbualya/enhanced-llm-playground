@@ -1,55 +1,4 @@
-/***********************
-     * Export Research Data
-     ***********************/
-    function exportResearchData() {
-      try {
-        const allThreads = [...threads];
-        let csvContent = "thread_id,message_index,reasoning_method,word_limit,word_count,rating,timestamp\n";
-        
-        allThreads.forEach(thread => {
-          let messageIndex = 0;
-          thread.messages.forEach(msg => {
-            // Only include bot messages that aren't placeholders
-            if (msg.sender === "bot" && !msg.isPlaceholder) {
-              const threadId = thread.id;
-              
-              // Parse reasoning method and word limit
-              let reasoningMethod = msg.reasoningMethod || REASONING_METHOD.toUpperCase();
-              let wordLimit = "";
-              
-              if (reasoningMethod.includes("COD-")) {
-                const parts = reasoningMethod.split("-");
-                reasoningMethod = "COD";
-                wordLimit = parts[1] || "";
-              }
-              
-              const wordCount = msg.wordCount || 0;
-              const rating = msg.rating !== null ? msg.rating : "";
-              const timestamp = msg.timestamp.toISOString();
-              
-              csvContent += `${threadId},${messageIndex},${reasoningMethod},${wordLimit},${wordCount},${rating},${timestamp}\n`;
-            }
-            messageIndex++;
-          });
-        });
-        
-        // Create downloadable file
-        const blob = new Blob([csvContent], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `llm_research_data_${new Date().toISOString().slice(0,10)}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification("Research data exported to CSV");
-      } catch (err) {
-        console.error("Error exporting research data:", err);
-        showNotification("Error exporting research data");
-      }
-    }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -261,63 +210,6 @@
       border-radius: 12px;
       border: 1px solid #555;
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-    
-    /* Rating System Styles */
-    .rating-container {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid #444;
-      text-align: center;
-    }
-    .rating-stars {
-      display: inline-flex;
-      gap: 5px;
-      margin-top: 5px;
-    }
-    .rating-star {
-      cursor: pointer;
-      width: 20px;
-      height: 20px;
-      background-color: #333;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: #888;
-      transition: all 0.2s ease;
-    }
-    .rating-star:hover {
-      background-color: #444;
-    }
-    .rating-star.selected {
-      background-color: #4a8cff;
-      color: white;
-    }
-    .rating-label {
-      display: block;
-      font-size: 0.8rem;
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-    .rating-submit {
-      margin-top: 5px;
-      padding: 3px 8px;
-      background-color: #3a3a3a;
-      color: #ddd;
-      border: none;
-      border-radius: 3px;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .rating-submit:hover {
-      background-color: #4a4a4a;
-    }
-    .rating-submitted {
-      font-size: 0.8rem;
-      color: #6a6;
-      margin-top: 5px;
     }
     /* --------------------------------
        Code Block Styles
@@ -626,16 +518,6 @@
       border-radius: 50%;
       font-size: 12px;
       cursor: help;
-    }
-    
-    /* Better visibility for section headers */
-    .settings-section-header {
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin: 16px 0 12px 0;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #444;
-      color: #eee;
     }
 
     /* COD Word Limit dropdown */
@@ -1030,9 +912,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       updateThreadList();
       renderCurrentThreadMessages();
       
-      // Save to localStorage
-      saveThreadsToLocalStorage();
-      
       // Show status notification
       showNotification("New thread created");
     }
@@ -1067,10 +946,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
         updateThreadList();
         renderCurrentThreadMessages();
-        
-        // Save to localStorage
-        saveThreadsToLocalStorage();
-        
         showNotification("Thread deleted");
       }
     }
@@ -1109,6 +984,17 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
+     * Word Counting Utility
+     ***********************/
+    function countWords(text) {
+      // Remove code blocks to get more accurate word count for actual text
+      const textWithoutCode = text.replace(/```[\s\S]*?```/g, '');
+      // Split by whitespace and filter out empty strings
+      const words = textWithoutCode.split(/\s+/).filter(word => word.length > 0);
+      return words.length;
+    }
+
+    /***********************
      * Download as TXT
      ***********************/
     function downloadCurrentThreadAsTxt() {
@@ -1127,11 +1013,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         // Add word count info for bot messages
         let headerInfo = prefix;
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
-          if (msg.rating !== null) {
-            headerInfo += ` - Rating: ${msg.rating}/10`;
-          }
-          headerInfo += `]`;
+          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
         }
         
         content += `${headerInfo}:\n`;
@@ -1208,11 +1090,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         // Add word count info for bot messages
         let sender = msg.sender.toUpperCase() + ":";
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
-          if (msg.rating !== null) {
-            sender += ` - Rating: ${msg.rating}/10`;
-          }
-          sender += `]`;
+          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
         }
         
         doc.text(sender, leftMargin, yPos);
@@ -1262,128 +1140,45 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Rating System
+     * Rendering Messages
      ***********************/
-    function createRatingSystem(messageDiv, msgIndex) {
+    function renderCurrentThreadMessages() {
+      const chatMessagesDiv = document.getElementById("chatMessages");
+      chatMessagesDiv.innerHTML = "";
       const thread = threads.find(t => t.id === currentThreadId);
-      if (!thread || !thread.messages[msgIndex]) return;
-      
-      const msg = thread.messages[msgIndex];
-      
-      // Only add rating system to bot messages (that aren't placeholders)
-      if (msg.sender !== "bot" || msg.isPlaceholder) return;
-      
-      // Create rating container
-      const ratingContainer = document.createElement("div");
-      ratingContainer.className = "rating-container";
-      
-      // If already rated, show the rating
-      if (msg.rating !== null) {
-        const ratingDisplay = document.createElement("div");
-        ratingDisplay.className = "rating-submitted";
-        ratingDisplay.textContent = `Response rated: ${msg.rating}/10`;
-        ratingContainer.appendChild(ratingDisplay);
-        messageDiv.appendChild(ratingContainer);
-        return;
-      }
-      
-      // Create rating label
-      const ratingLabel = document.createElement("div");
-      ratingLabel.className = "rating-label";
-      ratingLabel.textContent = "Rate this response (1-10):";
-      ratingContainer.appendChild(ratingLabel);
-      
-      // Create stars container
-      const starsContainer = document.createElement("div");
-      starsContainer.className = "rating-stars";
-      
-      // Create 10 rating options
-      let selectedRating = 0;
-      for (let i = 1; i <= 10; i++) {
-        const star = document.createElement("div");
-        star.className = "rating-star";
-        star.textContent = i;
-        star.dataset.value = i;
-        
-        star.addEventListener("click", function() {
-          // Clear all selected stars
-          document.querySelectorAll(`#star-${msgIndex}-${i}`).forEach(s => {
-            s.classList.remove("selected");
-          });
-          
-          // Select stars up to the clicked one
-          for (let j = 1; j <= i; j++) {
-            document.querySelectorAll(`#star-${msgIndex}-${j}`).forEach(s => {
-              s.classList.add("selected");
-            });
+      if (thread) {
+        thread.messages.forEach(msg => {
+          const messageDiv = document.createElement("div");
+          messageDiv.classList.add("message", msg.sender);
+          if (msg.isPlaceholder) {
+            messageDiv.classList.add("placeholder");
           }
+
+          const timestampStr = msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const timestampEl = document.createElement("small");
+          timestampEl.textContent = timestampStr;
+          timestampEl.style.color = "#aaa";
+          timestampEl.style.display = "block";
+          timestampEl.style.marginBottom = "0.5rem";
+          messageDiv.appendChild(timestampEl);
+
+          const contentEl = document.createElement("div");
+          contentEl.innerHTML = transformMessage(msg.content);
+          messageDiv.appendChild(contentEl);
           
-          selectedRating = i;
+          // Add word count badge for bot messages (except placeholders)
+          if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
+            const wordCountBadge = document.createElement("div");
+            wordCountBadge.className = "word-count-badge";
+            wordCountBadge.textContent = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+            messageDiv.appendChild(wordCountBadge);
+          }
+
+          chatMessagesDiv.appendChild(messageDiv);
         });
-        
-        // Add unique ID for targeting
-        star.id = `star-${msgIndex}-${i}`;
-        
-        starsContainer.appendChild(star);
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
       }
-      ratingContainer.appendChild(starsContainer);
-      
-      // Create submit button
-      const submitBtn = document.createElement("button");
-      submitBtn.className = "rating-submit";
-      submitBtn.textContent = "Submit Rating";
-      submitBtn.addEventListener("click", function() {
-        if (selectedRating > 0) {
-          // Save rating to the message
-          thread.messages[msgIndex].rating = selectedRating;
-          
-          // Remove rating system and show confirmation
-          ratingContainer.innerHTML = "";
-          const ratingDisplay = document.createElement("div");
-          ratingDisplay.className = "rating-submitted";
-          ratingDisplay.textContent = `Response rated: ${selectedRating}/10`;
-          ratingContainer.appendChild(ratingDisplay);
-          
-          // Also save to localStorage
-          saveThreadsToLocalStorage();
-          
-          // Show notification
-          showNotification(`Rating of ${selectedRating}/10 saved for research`);
-        } else {
-          showNotification("Please select a rating first");
-        }
-      });
-      ratingContainer.appendChild(submitBtn);
-      
-      messageDiv.appendChild(ratingContainer);
-    }
-    
-    function saveThreadsToLocalStorage() {
-      try {
-        localStorage.setItem("threads", JSON.stringify(threads));
-      } catch (err) {
-        console.error("Error saving threads to localStorage:", err);
-      }
-    }
-    
-    function loadThreadsFromLocalStorage() {
-      try {
-        const savedThreads = localStorage.getItem("threads");
-        if (savedThreads) {
-          threads = JSON.parse(savedThreads);
-          
-          // Convert date strings back to Date objects
-          threads.forEach(thread => {
-            thread.messages.forEach(msg => {
-              if (msg.timestamp) {
-                msg.timestamp = new Date(msg.timestamp);
-              }
-            });
-          });
-        }
-      } catch (err) {
-        console.error("Error loading threads from localStorage:", err);
-      }
+      addCodeCopyButtons();
     }
 
     function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
@@ -1397,15 +1192,9 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           wordCount: sender === "bot" && !isPlaceholder ? countWords(content) : undefined,
           reasoningMethod: sender === "bot" && !isPlaceholder ? 
             (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
-            undefined,
-          rating: null
+            undefined
         });
         renderCurrentThreadMessages();
-        
-        // Save to localStorage if not a placeholder
-        if (!isPlaceholder) {
-          saveThreadsToLocalStorage();
-        }
       }
     }
 
@@ -1427,12 +1216,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         
         // If it's COD, update the word limit
         if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
-          // Make sure we're using the fresh prompt and not a cached version
-          systemPrompt = PROMPTS[REASONING_METHOD].replace(/with \d+ words at most/, `with ${COD_WORD_LIMIT} words at most`);
+          systemPrompt = systemPrompt.replace(/with \d+ words at most/, `with ${COD_WORD_LIMIT} words at most`);
         }
         
         console.log(`Using ${REASONING_METHOD.toUpperCase()} prompt ${REASONING_METHOD === "cod" ? "with word limit " + COD_WORD_LIMIT : ""}`);
-        console.log("System prompt:", systemPrompt);
         
         messages.push({
           role: "system",
@@ -1456,17 +1243,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Word Counting Utility
-     ***********************/
-    function countWords(text) {
-      // Remove code blocks to get more accurate word count for actual text
-      const textWithoutCode = text.replace(/```[\s\S]*?```/g, '');
-      // Split by whitespace and filter out empty strings
-      const words = textWithoutCode.split(/\s+/).filter(word => word.length > 0);
-      return words.length;
-    }
-    
-    /***********************
      * Message Sending
      ***********************/
     async function sendMessage(message) {
@@ -1486,7 +1262,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       // Build messages array with current settings
       const messagesForApi = buildMessagesForChat();
 
-      // Create the payload WITHOUT the request_id that might be causing issues
+      // Create payload
       const payload = {
         model: MODEL_NAME,
         max_tokens: MAX_TOKENS,
@@ -1502,7 +1278,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
 
       try {
-        // Add timestamp to URL to prevent caching instead of in payload
+        // Add timestamp to URL to prevent caching
         const timestamp = new Date().getTime();
         const cacheBuster = `?t=${timestamp}`;
         
@@ -1543,7 +1319,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           };
         } else {
           thread.messages[placeholderIndex] = {
-            content: "No valid response received.",
+            content: "No valid response received. Check model name and API key.",
             sender: "bot",
             isPlaceholder: false,
             timestamp: new Date(),
@@ -1553,11 +1329,22 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
       } catch (error) {
         console.error("Error communicating with API:", error);
+        
+        // Provide more detailed error message
+        let errorMessage = "Error communicating with API: " + error.message;
+        
+        // Add suggestions based on error type
+        if (error.message.includes("Failed to fetch")) {
+          errorMessage += "\n\nPossible solutions:\n1. Make sure your API key is set correctly in Netlify\n2. Check that your model name is valid\n3. Verify your internet connection";
+        }
+        
         thread.messages[placeholderIndex] = {
-          content: "Error communicating with API: " + error.message,
+          content: errorMessage,
           sender: "bot",
           isPlaceholder: false,
-          timestamp: new Date()
+          timestamp: new Date(),
+          wordCount: 0,
+          reasoningMethod: REASONING_METHOD.toUpperCase()
         };
       }
       renderCurrentThreadMessages();
@@ -1983,39 +1770,43 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
      * Initialization
      ***********************/
     function loadPersistedSettings() {
-      MODEL_NAME = localStorage.getItem("modelName") || "";
-      MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
-      
-      REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
-      
-      const codWordLimit = localStorage.getItem("codWordLimit");
-      if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
-      
-      // Load custom prompts if available
-      const storedPrompts = localStorage.getItem("customPrompts");
-      if (storedPrompts) {
-        const parsedPrompts = JSON.parse(storedPrompts);
-        // Merge with default prompts to ensure all properties exist
-        PROMPTS = { ...PROMPTS, ...parsedPrompts };
+      try {
+        MODEL_NAME = localStorage.getItem("modelName") || "";
+        MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
+        
+        REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
+        
+        const codWordLimit = localStorage.getItem("codWordLimit");
+        if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
+        
+        // Load custom prompts if available
+        const storedPrompts = localStorage.getItem("customPrompts");
+        if (storedPrompts) {
+          const parsedPrompts = JSON.parse(storedPrompts);
+          // Merge with default prompts to ensure all properties exist
+          PROMPTS = { ...PROMPTS, ...parsedPrompts };
+        }
+        
+        const temp = localStorage.getItem("temperature");
+        if (temp) TEMPERATURE = parseFloat(temp);
+        
+        const topP = localStorage.getItem("topP");
+        if (topP) TOP_P = parseFloat(topP);
+        
+        const topK = localStorage.getItem("topK");
+        if (topK) TOP_K = parseInt(topK);
+        
+        const maxTokens = localStorage.getItem("maxTokens");
+        if (maxTokens) MAX_TOKENS = parseInt(maxTokens);
+        
+        const presencePenalty = localStorage.getItem("presencePenalty");
+        if (presencePenalty) PRESENCE_PENALTY = parseFloat(presencePenalty);
+        
+        const frequencyPenalty = localStorage.getItem("frequencyPenalty");
+        if (frequencyPenalty) FREQUENCY_PENALTY = parseFloat(frequencyPenalty);
+      } catch (err) {
+        console.error("Error loading settings:", err);
       }
-      
-      const temp = localStorage.getItem("temperature");
-      if (temp) TEMPERATURE = parseFloat(temp);
-      
-      const topP = localStorage.getItem("topP");
-      if (topP) TOP_P = parseFloat(topP);
-      
-      const topK = localStorage.getItem("topK");
-      if (topK) TOP_K = parseInt(topK);
-      
-      const maxTokens = localStorage.getItem("maxTokens");
-      if (maxTokens) MAX_TOKENS = parseInt(maxTokens);
-      
-      const presencePenalty = localStorage.getItem("presencePenalty");
-      if (presencePenalty) PRESENCE_PENALTY = parseFloat(presencePenalty);
-      
-      const frequencyPenalty = localStorage.getItem("frequencyPenalty");
-      if (frequencyPenalty) FREQUENCY_PENALTY = parseFloat(frequencyPenalty);
     }
 
     function init() {
@@ -2033,6 +1824,32 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         
         updateCurrentModelDisplay();
         console.log("Model display updated");
+        
+        // Helper function to create a button that resets the thread
+        function createClearThreadButton() {
+          const clearThreadBtn = document.createElement("button");
+          clearThreadBtn.id = "clearThreadBtn";
+          clearThreadBtn.textContent = "Clear Thread";
+          clearThreadBtn.style.marginTop = "0.5rem";
+          clearThreadBtn.style.backgroundColor = "#553333";
+          clearThreadBtn.addEventListener("click", () => {
+            if (confirm("Clear all messages in this thread?")) {
+              const thread = threads.find(t => t.id === currentThreadId);
+              if (thread) {
+                thread.messages = [];
+                renderCurrentThreadMessages();
+                showNotification("Thread cleared");
+              }
+            }
+          });
+          return clearThreadBtn;
+        }
+        
+        // Add clear thread button to the sidebar
+        const sidebar = document.querySelector(".sidebar");
+        if (sidebar) {
+          sidebar.appendChild(createClearThreadButton());
+        }
         
         // If we don't have a model name, open settings modal
         if (!MODEL_NAME) {
