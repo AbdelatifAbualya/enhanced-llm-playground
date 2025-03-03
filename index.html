@@ -2,48 +2,53 @@
      * Export Research Data
      ***********************/
     function exportResearchData() {
-      const allThreads = [...threads];
-      let csvContent = "thread_id,message_index,reasoning_method,word_limit,word_count,rating,timestamp\n";
-      
-      allThreads.forEach(thread => {
-        let messageIndex = 0;
-        thread.messages.forEach(msg => {
-          // Only include bot messages that aren't placeholders
-          if (msg.sender === "bot" && !msg.isPlaceholder) {
-            const threadId = thread.id;
-            
-            // Parse reasoning method and word limit
-            let reasoningMethod = msg.reasoningMethod || REASONING_METHOD.toUpperCase();
-            let wordLimit = "";
-            
-            if (reasoningMethod.includes("COD-")) {
-              const parts = reasoningMethod.split("-");
-              reasoningMethod = "COD";
-              wordLimit = parts[1] || "";
+      try {
+        const allThreads = [...threads];
+        let csvContent = "thread_id,message_index,reasoning_method,word_limit,word_count,rating,timestamp\n";
+        
+        allThreads.forEach(thread => {
+          let messageIndex = 0;
+          thread.messages.forEach(msg => {
+            // Only include bot messages that aren't placeholders
+            if (msg.sender === "bot" && !msg.isPlaceholder) {
+              const threadId = thread.id;
+              
+              // Parse reasoning method and word limit
+              let reasoningMethod = msg.reasoningMethod || REASONING_METHOD.toUpperCase();
+              let wordLimit = "";
+              
+              if (reasoningMethod.includes("COD-")) {
+                const parts = reasoningMethod.split("-");
+                reasoningMethod = "COD";
+                wordLimit = parts[1] || "";
+              }
+              
+              const wordCount = msg.wordCount || 0;
+              const rating = msg.rating !== null ? msg.rating : "";
+              const timestamp = msg.timestamp.toISOString();
+              
+              csvContent += `${threadId},${messageIndex},${reasoningMethod},${wordLimit},${wordCount},${rating},${timestamp}\n`;
             }
-            
-            const wordCount = msg.wordCount || 0;
-            const rating = msg.rating !== null ? msg.rating : "";
-            const timestamp = msg.timestamp.toISOString();
-            
-            csvContent += `${threadId},${messageIndex},${reasoningMethod},${wordLimit},${wordCount},${rating},${timestamp}\n`;
-          }
-          messageIndex++;
+            messageIndex++;
+          });
         });
-      });
-      
-      // Create downloadable file
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `llm_research_data_${new Date().toISOString().slice(0,10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      showNotification("Research data exported to CSV");
+        
+        // Create downloadable file
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `llm_research_data_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification("Research data exported to CSV");
+      } catch (err) {
+        console.error("Error exporting research data:", err);
+        showNotification("Error exporting research data");
+      }
     }<!DOCTYPE html>
 <html lang="en">
 <head>
