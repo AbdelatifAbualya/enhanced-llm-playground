@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1336,25 +1335,44 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     
     // Tab handling
     function setupTabNavigation() {
-      // Get all tab buttons and tab contents
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-      
-      // Add click event listeners to tab buttons
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          // Remove active class from all buttons and contents
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          tabContents.forEach(content => content.classList.remove('active'));
-          
-          // Add active class to clicked button
-          button.classList.add('active');
-          
-          // Show corresponding tab content
-          const tabId = button.getAttribute('data-tab');
-          document.getElementById(tabId).classList.add('active');
+      try {
+        console.log("Setting up tab navigation");
+        
+        // Get all tab buttons and tab contents
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        if (tabButtons.length === 0) {
+          console.warn("No tab buttons found");
+        }
+        
+        // Add click event listeners to tab buttons
+        tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            try {
+              // Remove active class from all buttons and contents
+              tabButtons.forEach(btn => btn.classList.remove('active'));
+              tabContents.forEach(content => content.classList.remove('active'));
+              
+              // Add active class to clicked button
+              button.classList.add('active');
+              
+              // Show corresponding tab content
+              const tabId = button.getAttribute('data-tab');
+              const tabContent = document.getElementById(tabId);
+              if (tabContent) {
+                tabContent.classList.add('active');
+              } else {
+                console.warn(`Tab content with id "${tabId}" not found`);
+              }
+            } catch (err) {
+              console.error("Error handling tab click:", err);
+            }
+          });
         });
-      });
+      } catch (err) {
+        console.error("Error in setupTabNavigation:", err);
+      }
     }
     
     // Custom model handling
@@ -1466,36 +1484,45 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
     
     function openSettingsModal() {
-      // Initialize settings UI
-      document.getElementById("modelName").value = MODEL_NAME;
+      try {
+        console.log("Opening settings modal");
+        
+        // Initialize settings UI
+        const modelNameInput = document.getElementById("modelName");
+        if (modelNameInput) modelNameInput.value = MODEL_NAME;
+        
+        // Set reasoning method radio buttons
+        const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
+        if (reasoningRadio) reasoningRadio.checked = true;
+        
+        // Set COD word limit
+        const codWordLimit = document.getElementById("codWordLimit");
+        if (codWordLimit) codWordLimit.value = COD_WORD_LIMIT.toString();
+        
+        // Set parameter sliders
+        setSliderAndValue("temp", TEMPERATURE);
+        setSliderAndValue("topP", TOP_P);
+        setSliderAndValue("topK", TOP_K);
+        setSliderAndValue("maxTokens", MAX_TOKENS);
+        setSliderAndValue("presencePenalty", PRESENCE_PENALTY);
+        setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
+        
+        // Show modal
+        const modal = document.getElementById("settingsModal");
+        if (modal) modal.style.display = "block";
+        
+        console.log("Settings modal opened successfully");
+      } catch (err) {
+        console.error("Error in openSettingsModal:", err);
+      }
+    }
+    
+    function setSliderAndValue(id, value) {
+      const slider = document.getElementById(id);
+      const valueDisplay = document.getElementById(`${id}Value`);
       
-      // Set reasoning method radio buttons
-      document.getElementById(`${REASONING_METHOD}Reasoning`).checked = true;
-      
-      // Set COD word limit
-      document.getElementById("codWordLimit").value = COD_WORD_LIMIT.toString();
-      
-      // Set parameter sliders
-      document.getElementById("temp").value = TEMPERATURE;
-      document.getElementById("tempValue").textContent = TEMPERATURE;
-      
-      document.getElementById("topP").value = TOP_P;
-      document.getElementById("topPValue").textContent = TOP_P;
-      
-      document.getElementById("topK").value = TOP_K;
-      document.getElementById("topKValue").textContent = TOP_K;
-      
-      document.getElementById("maxTokens").value = MAX_TOKENS;
-      document.getElementById("maxTokensValue").textContent = MAX_TOKENS;
-      
-      document.getElementById("presencePenalty").value = PRESENCE_PENALTY;
-      document.getElementById("presencePenaltyValue").textContent = PRESENCE_PENALTY;
-      
-      document.getElementById("frequencyPenalty").value = FREQUENCY_PENALTY;
-      document.getElementById("frequencyPenaltyValue").textContent = FREQUENCY_PENALTY;
-      
-      // Show modal
-      document.getElementById("settingsModal").style.display = "block";
+      if (slider) slider.value = value;
+      if (valueDisplay) valueDisplay.textContent = value;
     }
 
     function closeSettingsModal() {
@@ -1503,100 +1530,152 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     function saveSettings() {
-      // Save model name
-      MODEL_NAME = document.getElementById("modelName").value.trim();
-      MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
-      
-      // Save reasoning method
-      const reasoningRadios = document.getElementsByName("reasoningMethod");
-      for (const radio of reasoningRadios) {
-        if (radio.checked) {
-          REASONING_METHOD = radio.value;
-          break;
+      try {
+        console.log("Saving settings...");
+        
+        // Save model name
+        const modelNameEl = document.getElementById("modelName");
+        if (modelNameEl) {
+          MODEL_NAME = modelNameEl.value.trim();
+          MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
         }
+        
+        // Save reasoning method
+        const reasoningRadios = document.getElementsByName("reasoningMethod");
+        for (const radio of reasoningRadios) {
+          if (radio.checked) {
+            REASONING_METHOD = radio.value;
+            break;
+          }
+        }
+        
+        // Save COD word limit if applicable
+        if (REASONING_METHOD === "cod") {
+          const codWordLimitEl = document.getElementById("codWordLimit");
+          if (codWordLimitEl) {
+            COD_WORD_LIMIT = parseInt(codWordLimitEl.value);
+          }
+        }
+        
+        // Save generation parameters safely
+        const getNumericValue = (id, defaultVal, parseFunc) => {
+          const el = document.getElementById(id);
+          return el ? parseFunc(el.value) : defaultVal;
+        };
+        
+        TEMPERATURE = getNumericValue("temp", 0.5, parseFloat);
+        TOP_P = getNumericValue("topP", 0.9, parseFloat);
+        TOP_K = getNumericValue("topK", 55, parseInt);
+        MAX_TOKENS = getNumericValue("maxTokens", 1112, parseInt);
+        PRESENCE_PENALTY = getNumericValue("presencePenalty", 0, parseFloat);
+        FREQUENCY_PENALTY = getNumericValue("frequencyPenalty", 0.4, parseFloat);
+        
+        // Update model display
+        updateCurrentModelDisplay();
+        
+        // Save settings to localStorage
+        try {
+          localStorage.setItem("modelName", MODEL_NAME);
+          localStorage.setItem("reasoningMethod", REASONING_METHOD);
+          localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
+          localStorage.setItem("temperature", TEMPERATURE.toString());
+          localStorage.setItem("topP", TOP_P.toString());
+          localStorage.setItem("topK", TOP_K.toString());
+          localStorage.setItem("maxTokens", MAX_TOKENS.toString());
+          localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString());
+          localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString());
+          
+          // Save custom prompts
+          localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
+          console.log("Settings saved to localStorage");
+        } catch (storageErr) {
+          console.error("Error saving to localStorage:", storageErr);
+        }
+        
+        closeSettingsModal();
+        showNotification("Settings saved");
+      } catch (err) {
+        console.error("Error in saveSettings:", err);
+        showNotification("Error saving settings");
       }
-      
-      // Save COD word limit if applicable
-      if (REASONING_METHOD === "cod") {
-        COD_WORD_LIMIT = parseInt(document.getElementById("codWordLimit").value);
-      }
-      
-      // Save generation parameters
-      TEMPERATURE = parseFloat(document.getElementById("temp").value);
-      TOP_P = parseFloat(document.getElementById("topP").value);
-      TOP_K = parseInt(document.getElementById("topK").value);
-      MAX_TOKENS = parseInt(document.getElementById("maxTokens").value);
-      PRESENCE_PENALTY = parseFloat(document.getElementById("presencePenalty").value);
-      FREQUENCY_PENALTY = parseFloat(document.getElementById("frequencyPenalty").value);
-      
-      // Update model display
-      updateCurrentModelDisplay();
-      
-      // Save settings to localStorage
-      localStorage.setItem("modelName", MODEL_NAME);
-      localStorage.setItem("reasoningMethod", REASONING_METHOD);
-      localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
-      localStorage.setItem("temperature", TEMPERATURE.toString());
-      localStorage.setItem("topP", TOP_P.toString());
-      localStorage.setItem("topK", TOP_K.toString());
-      localStorage.setItem("maxTokens", MAX_TOKENS.toString());
-      localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString());
-      localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString());
-      
-      // Save custom prompts
-      localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
-      
-      closeSettingsModal();
-      showNotification("Settings saved");
     }
 
     /***********************
      * Event Listeners
      ***********************/
     function initEventListeners() {
-      // Settings buttons
-      document.getElementById("openSettings").addEventListener("click", openSettingsModal);
-      document.getElementById("closeSettings").addEventListener("click", closeSettingsModal);
-      document.getElementById("closeModalX").addEventListener("click", closeSettingsModal);
-      document.getElementById("saveSettings").addEventListener("click", saveSettings);
-      
-      // Thread management
-      document.getElementById("newThreadBtn").addEventListener("click", createNewThread);
-      document.getElementById("deleteThreadBtn").addEventListener("click", deleteCurrentThread);
-      document.getElementById("downloadTxtBtn").addEventListener("click", downloadCurrentThreadAsTxt);
-      document.getElementById("downloadPdfBtn").addEventListener("click", downloadCurrentThreadAsPdf);
-      
-      // Message sending
-      document.getElementById("sendBtn").addEventListener("click", () => {
+      try {
+        console.log("Initializing event listeners");
+        
+        // Helper function to safely add event listeners
+        const addListener = (id, event, handler) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener(event, handler);
+          } else {
+            console.warn(`Element with id "${id}" not found for event listener`);
+          }
+        };
+        
+        // Settings buttons
+        addListener("openSettings", "click", openSettingsModal);
+        addListener("closeSettings", "click", closeSettingsModal);
+        addListener("closeModalX", "click", closeSettingsModal);
+        addListener("saveSettings", "click", saveSettings);
+        
+        // Thread management
+        addListener("newThreadBtn", "click", createNewThread);
+        addListener("deleteThreadBtn", "click", deleteCurrentThread);
+        addListener("downloadTxtBtn", "click", downloadCurrentThreadAsTxt);
+        addListener("downloadPdfBtn", "click", downloadCurrentThreadAsPdf);
+        
+        // Message sending
+        addListener("sendBtn", "click", () => {
+          const userInput = document.getElementById("userInput");
+          if (userInput) {
+            const message = userInput.value.trim();
+            if (message) {
+              sendMessage(message);
+              userInput.value = "";
+            }
+          }
+        });
+        
         const userInput = document.getElementById("userInput");
-        const message = userInput.value.trim();
-        if (message) {
-          sendMessage(message);
-          userInput.value = "";
+        if (userInput) {
+          userInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              const sendBtn = document.getElementById("sendBtn");
+              if (sendBtn) sendBtn.click();
+            }
+          });
         }
-      });
-      
-      document.getElementById("userInput").addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          document.getElementById("sendBtn").click();
-        }
-      });
-      
-      // Close modal when clicking outside
-      window.addEventListener("click", (event) => {
-        const modal = document.getElementById("settingsModal");
-        if (event.target === modal) {
-          closeSettingsModal();
-        }
-      });
-      
-      // Set up settings UI functionality
-      setupTabNavigation();
-      setupModelInput();
-      setupCODOptions();
-      setupCustomPromptEditor();
-      setupSliders();
+        
+        // Close modal when clicking outside
+        window.addEventListener("click", (event) => {
+          const modal = document.getElementById("settingsModal");
+          if (modal && event.target === modal) {
+            closeSettingsModal();
+          }
+        });
+        
+        // Set up settings UI functionality
+        setTimeout(() => {
+          try {
+            setupTabNavigation();
+            setupModelInput();
+            setupCODOptions();
+            setupCustomPromptEditor();
+            setupSliders();
+            console.log("UI functionality setup complete");
+          } catch (err) {
+            console.error("Error setting up UI functionality:", err);
+          }
+        }, 100);
+      } catch (err) {
+        console.error("Error initializing event listeners:", err);
+      }
     }
 
     /***********************
@@ -1639,22 +1718,45 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     function init() {
-      loadPersistedSettings();
+      console.log("Initializing app...");
       
-      createNewThread();
-      initEventListeners();
-      updateCurrentModelDisplay();
-      
-      // If we don't have a model name, open settings modal
-      if (!MODEL_NAME) {
-        setTimeout(() => {
-          openSettingsModal();
-        }, 500);
+      try {
+        loadPersistedSettings();
+        console.log("Settings loaded");
+        
+        createNewThread();
+        console.log("New thread created");
+        
+        initEventListeners();
+        console.log("Event listeners initialized");
+        
+        updateCurrentModelDisplay();
+        console.log("Model display updated");
+        
+        // If we don't have a model name, open settings modal
+        if (!MODEL_NAME) {
+          console.log("No model name found, opening settings");
+          setTimeout(() => {
+            try {
+              openSettingsModal();
+              console.log("Settings modal opened");
+            } catch (err) {
+              console.error("Error opening settings modal:", err);
+            }
+          }, 1000);
+        }
+      } catch (err) {
+        console.error("Initialization error:", err);
       }
     }
 
     // Initialize the application
     document.addEventListener("DOMContentLoaded", init);
+    
+    // Backup initialization - in case the DOMContentLoaded event already fired
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      setTimeout(init, 1);
+    }
   </script>
 </body>
 </html>
