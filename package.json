@@ -1,0 +1,8 @@
+{
+  "name": "enhanced-llm-playground",
+  "version": "1.0.0",
+  "description": "Enhanced LLM Playground with Chain of Thought and Draft reasoning",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
