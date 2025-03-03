@@ -8,14 +8,7 @@
   # Directory with the serverless functions
   functions = "netlify/functions"
 
-# Redirect API calls to the serverless function
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-
-# Tell Netlify how to handle the single page application
+# Properly configured redirect for single-page application
 [[redirects]]
   from = "/*"
   to = "/index.html"
