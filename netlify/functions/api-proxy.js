@@ -1,26 +1,17 @@
-// Netlify Function to securely proxy requests to Fireworks.ai
-// Place this file in netlify/functions/api-proxy.js
-
-const fetch = require('node-fetch');
-
+// netlify/functions/api-proxy.js
 exports.handler = async function(event, context) {
-  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
       body: JSON.stringify({ error: 'Method Not Allowed' }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Allow': 'POST'
-      }
+      headers: { 'Content-Type': 'application/json', 'Allow': 'POST' }
     };
   }
 
   try {
-    // Get API key from environment variable
     const API_KEY = process.env.FIREWORKS_API_KEY;
-    
     if (!API_KEY) {
+      console.error('No API key found');
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'API key not configured' }),
@@ -28,10 +19,17 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Parse the request body
+    if (!event.body) {
+      console.error('No request body provided');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Request body is required' }),
+        headers: { 'Content-Type': 'application/json' }
+      };
+    }
+
     const requestBody = JSON.parse(event.body);
-    
-    // Forward the request to Fireworks.ai
+
     const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,19 +39,23 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(requestBody)
     });
 
-    // Get the response data
     const data = await response.json();
+    if (!response.ok) {
+      console.error('Fireworks.ai error:', { status: response.status, data });
+      return {
+        statusCode: response.status,
+        body: JSON.stringify({ error: 'API request failed', details: data }),
+        headers: { 'Content-Type': 'application/json' }
+      };
+    }
 
-    // Return the response from Fireworks.ai
     return {
-      statusCode: response.status,
+      statusCode: 200,
       body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers: { 'Content-Type': 'application/json' }
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Function error:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error', message: error.message }),
