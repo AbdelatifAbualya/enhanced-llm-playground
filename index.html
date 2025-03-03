@@ -1269,10 +1269,8 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
 
       // Build messages array with current settings
       const messagesForApi = buildMessagesForChat();
-      
-      // Add a timestamp to prevent caching
-      const timestamp = new Date().getTime();
 
+      // Create the payload WITHOUT the request_id that might be causing issues
       const payload = {
         model: MODEL_NAME,
         max_tokens: MAX_TOKENS,
@@ -1281,19 +1279,21 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         presence_penalty: PRESENCE_PENALTY,
         frequency_penalty: FREQUENCY_PENALTY,
         temperature: TEMPERATURE,
-        messages: messagesForApi,
-        request_id: `request_${timestamp}_${Math.random().toString(36).substring(2, 15)}`
+        messages: messagesForApi
       };
       
       console.log(`Sending request with ${REASONING_METHOD} reasoning ${REASONING_METHOD === "cod" ? `(word limit: ${COD_WORD_LIMIT})` : ""}`);
       console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
 
       try {
-        const response = await fetch(API_PROXY_URL, {
+        // Add timestamp to URL to prevent caching instead of in payload
+        const timestamp = new Date().getTime();
+        const cacheBuster = `?t=${timestamp}`;
+        
+        const response = await fetch(`${API_PROXY_URL}${cacheBuster}`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache, no-store"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(payload)
         });
