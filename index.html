@@ -199,6 +199,18 @@
       font-style: italic;
       color: #888;
     }
+    .word-count-badge {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      background-color: rgba(30, 30, 30, 0.9);
+      color: #ddd;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid #555;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
     /* --------------------------------
        Code Block Styles
     -------------------------------- */
@@ -996,7 +1008,14 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
 
       thread.messages.forEach(msg => {
         const prefix = msg.sender.toUpperCase();
-        content += `${prefix}:\n`;
+        
+        // Add word count info for bot messages
+        let headerInfo = prefix;
+        if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
+          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+        }
+        
+        content += `${headerInfo}:\n`;
         const parsed = parseContentForExport(msg.content);
         parsed.forEach(item => {
           if (item.type === 'text') {
@@ -1066,7 +1085,13 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       thread.messages.forEach(msg => {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
-        const sender = msg.sender.toUpperCase() + ":";
+        
+        // Add word count info for bot messages
+        let sender = msg.sender.toUpperCase() + ":";
+        if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
+          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+        }
+        
         doc.text(sender, leftMargin, yPos);
         yPos += lineHeight;
 
@@ -1139,6 +1164,14 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           const contentEl = document.createElement("div");
           contentEl.innerHTML = transformMessage(msg.content);
           messageDiv.appendChild(contentEl);
+          
+          // Add word count badge for bot messages (except placeholders)
+          if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
+            const wordCountBadge = document.createElement("div");
+            wordCountBadge.className = "word-count-badge";
+            wordCountBadge.textContent = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+            messageDiv.appendChild(wordCountBadge);
+          }
 
           chatMessagesDiv.appendChild(messageDiv);
         });
@@ -1201,6 +1234,17 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
+     * Word Counting Utility
+     ***********************/
+    function countWords(text) {
+      // Remove code blocks to get more accurate word count for actual text
+      const textWithoutCode = text.replace(/```[\s\S]*?```/g, '');
+      // Split by whitespace and filter out empty strings
+      const words = textWithoutCode.split(/\s+/).filter(word => word.length > 0);
+      return words.length;
+    }
+    
+    /***********************
      * Message Sending
      ***********************/
     async function sendMessage(message) {
@@ -1247,18 +1291,31 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
                          data.choices[0].message &&
                          data.choices[0].message.content;
         if (botReply) {
+          const trimmedReply = botReply.trim();
+          const wordCount = countWords(trimmedReply);
+          
+          // Create response metadata
+          let reasoningInfo = REASONING_METHOD.toUpperCase();
+          if (REASONING_METHOD === "cod") {
+            reasoningInfo += `-${COD_WORD_LIMIT}`;
+          }
+          
           thread.messages[placeholderIndex] = {
-            content: botReply.trim(),
+            content: trimmedReply,
             sender: "bot",
             isPlaceholder: false,
-            timestamp: new Date()
+            timestamp: new Date(),
+            wordCount: wordCount,
+            reasoningMethod: reasoningInfo
           };
         } else {
           thread.messages[placeholderIndex] = {
             content: "No valid response received.",
             sender: "bot",
             isPlaceholder: false,
-            timestamp: new Date()
+            timestamp: new Date(),
+            wordCount: 0,
+            reasoningMethod: REASONING_METHOD.toUpperCase()
           };
         }
       } catch (error) {
