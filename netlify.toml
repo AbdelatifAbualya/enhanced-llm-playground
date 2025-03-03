@@ -1,0 +1,22 @@
+# Netlify configuration file
+# This file should be in the root of your project
+
+[build]
+  # Directory that contains the deploy-ready HTML files and assets
+  publish = "/"
+  
+  # Directory with the serverless functions
+  functions = "netlify/functions"
+
+# Redirect API calls to the serverless function
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# Tell Netlify how to handle the single page application
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
