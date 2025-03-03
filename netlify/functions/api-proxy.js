@@ -1,7 +1,8 @@
 // Netlify Function to securely proxy requests to Fireworks.ai
-const fetch = require('node-fetch');
-
 exports.handler = async function(event, context) {
+  // Load fetch at runtime
+  const fetch = require('node-fetch');
+  
   // Handle OPTIONS request for CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -47,34 +48,50 @@ exports.handler = async function(event, context) {
     // Log request info (non-sensitive)
     console.log("Received request");
     
-    // Parse the request body
-    const requestBody = JSON.parse(event.body);
-    console.log(`Model requested: ${requestBody.model || 'not specified'}`);
-    
-    // Forward the request to Fireworks.ai
-    const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify(requestBody)
-    });
+    try {
+      // Parse the request body
+      const requestBody = JSON.parse(event.body);
+      console.log(`Model requested: ${requestBody.model || 'not specified'}`);
+      
+      // Forward the request to Fireworks.ai
+      const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify(requestBody)
+      });
 
-    console.log(`Fireworks API response status: ${response.status}`);
-    
-    // Get the response data
-    const data = await response.json();
-    
-    // Return the response from Fireworks.ai
-    return {
-      statusCode: response.status,
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    };
+      console.log(`Fireworks API response status: ${response.status}`);
+      
+      // Get the response data
+      const data = await response.json();
+      
+      // Return the response from Fireworks.ai
+      return {
+        statusCode: response.status,
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      };
+    } catch (parseError) {
+      console.error("Error parsing request:", parseError);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          error: 'Bad Request', 
+          message: 'Invalid request body'
+        }),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      };
+    }
   } catch (error) {
     console.error('Function error:', error.message);
     return {
