@@ -1,7 +1,7 @@
 {
-  "name": "enhanced-llm-playground",
+  "name": "llm-playground-cot-cod",
   "version": "1.0.0",
-  "description": "Enhanced LLM Playground with Chain of Thought and Draft reasoning",
+  "description": "LLM Playground for comparing Chain of Thought and Chain of Draft reasoning",
   "dependencies": {
     "node-fetch": "^2.6.7"
   }
