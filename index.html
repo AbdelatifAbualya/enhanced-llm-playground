@@ -753,18 +753,6 @@
             </select>
           </div>
         </div>
-        
-        <!-- Custom prompt editing -->
-        <div class="settings-section-header">Custom Prompts</div>
-        <div class="prompt-editor">
-          <label for="customPromptSelect">Edit prompt for:</label>
-          <select id="customPromptSelect">
-            <option value="cot">Chain of Thought</option>
-            <option value="cod">Chain of Draft</option>
-          </select>
-          <textarea id="customPromptEditor"></textarea>
-          <div class="prompt-reset" id="resetCustomPrompt">Reset to default</div>
-        </div>
       </div>
       
       <!-- Parameters Tab -->
@@ -1500,51 +1488,8 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       });
     }
     
-    // Custom prompt handling
     function setupCustomPromptEditor() {
-      const promptSelector = document.getElementById('customPromptSelect');
-      const promptEditor = document.getElementById('customPromptEditor');
-      const resetPromptBtn = document.getElementById('resetCustomPrompt');
-      
-      // Update prompt editor when selection changes
-      promptSelector.addEventListener('change', () => {
-        const promptType = promptSelector.value;
-        promptEditor.value = PROMPTS[promptType] || "";
-      });
-      
-      // Initialize with the first prompt
-      promptEditor.value = PROMPTS[promptSelector.value];
-      
-      // Save prompt when edited
-      promptEditor.addEventListener('blur', () => {
-        const promptType = promptSelector.value;
-        PROMPTS[promptType] = promptEditor.value;
-      });
-      
-      // Reset prompt to default
-      resetPromptBtn.addEventListener('click', () => {
-        const promptType = promptSelector.value;
-        
-        // Define default prompts
-        const DEFAULT_PROMPTS = {
-          cot: `Think step by step to solve this problem. Explain your reasoning at each step, then provide your final answer.`,
-          
-          cod: `Think step by step, but only keep a minimum draft for each thinking step, with 5 words at most. Return your final answer after the separator ####.
-
-Examples:
-Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?
-A: Initial: 20 lollipops. Remaining: 12 lollipops. Difference: 20 - 12. Calculate: 8 lollipops. #### 8 lollipops
-
-Q: If a fabric store received 45 yards of cotton material, and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
-A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`
-        };
-        
-        // Reset to default
-        PROMPTS[promptType] = DEFAULT_PROMPTS[promptType];
-        promptEditor.value = PROMPTS[promptType];
-        
-        showNotification(`Reset ${promptType.toUpperCase()} prompt to default`);
-      });
+      // Function removed as custom prompts section was removed
     }
     
     // Settings slider handling
@@ -1754,7 +1699,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             setupTabNavigation();
             setupModelInput();
             setupCODOptions();
-            setupCustomPromptEditor();
             setupSliders();
             console.log("UI functionality setup complete");
           } catch (err) {
