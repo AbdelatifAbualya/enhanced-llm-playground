@@ -252,18 +252,18 @@
       margin-bottom: 8px;
     }
     .word-count-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: rgba(30, 30, 30, 0.9);
-      color: #ddd;
-      font-size: 0.7rem;
-      padding: 3px 8px;
-      border-radius: 12px;
-      border: 1px solid #555;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-      white-space: nowrap;
-      z-index: 5;
+position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(30, 30, 30, 0.9);
+  color: #ddd;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  z-index: 5;
     }
     /* --------------------------------
        Code Block Styles
@@ -315,7 +315,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      overflow-y: auto;
+      overflow-y: auto; /* Changed from auto to allow scrolling */
       background-color: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(3px);
     }
@@ -324,13 +324,13 @@
       margin: 5% auto;
       padding: 20px;
       border: 1px solid #333;
-      width: 600px;
-      max-width: 90%;
+      width: 600px; /* Wider to accommodate settings */
+      max-width: 90%; /* Ensure it works on mobile */
       border-radius: 10px;
       color: #fff;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       position: relative;
-      max-height: 85vh;
+      max-height: 85vh; /* Limit height and enable scrolling */
       overflow-y: auto;
     }
     .modal-content label {
@@ -352,7 +352,7 @@
     }
     .modal-content select {
       appearance: none;
-      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
       background-repeat: no-repeat;
       background-position: right 0.7em top 50%;
       background-size: 0.65em auto;
@@ -813,6 +813,7 @@
       <div id="parametersTab" class="tab-content">
         <div class="settings-section-header">Generation Parameters</div>
         
+        <!-- Improved range sliders with visible values -->
         <label for="temp">Temperature</label>
         <div class="range-container">
           <input type="range" id="temp" min="0" max="1" step="0.01" value="0.5">
@@ -958,7 +959,7 @@
       standard: "",
       cot: `Think step by step to solve this problem. Explain your reasoning at each step, then provide your final answer.`,
       
-      cod: `Think step by step, but only keep a minimum draft for each thinking step, with 5 words at most. Return your final answer after the separator ####.
+      cod: `Think step by step, but only keep a minimum draft for each thinking step, with 5 words at most. Write your steps as simple phrases separated by periods, without using any markdown symbols like '###'. Return your final answer after the separator ####.
 
 Examples:
 Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?
@@ -1219,6 +1220,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
 
         // Special handling for messages with thinking/answer components
         if (msg.sender === "bot" && !msg.isPlaceholder && (msg.thinking || msg.answer)) {
+          // If we have thinking steps, render them
           if (msg.thinking) {
             doc.setFont("helvetica", "italic");
             doc.setFontSize(9);
@@ -1244,6 +1246,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             yPos += lineHeight/2;
           }
           
+          // If we have an answer, render it
           if (msg.answer) {
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
@@ -1269,6 +1272,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             });
           }
         } else {
+          // Standard rendering for other messages
           const parsed = parseContentForExport(msg.content);
           parsed.forEach(item => {
             if (item.type === 'text') {
@@ -1317,9 +1321,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
      * Process Bot Messages - IMPROVED VERSION
      ***********************/
     function processBotMessage(content, reasoningMethod) {
+      // For Chain of Draft (CoD) mode, look for the #### separator
       if (reasoningMethod === "cod") {
         const separatorIndex = content.indexOf("####");
         if (separatorIndex !== -1) {
+          // Extract thinking steps and final answer
           let thinking = content.substring(0, separatorIndex).trim();
           let answer = content.substring(separatorIndex + 4).trim();
           
@@ -1331,22 +1337,27 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
       }
       
+      // For Chain of Thought (CoT) mode, try to identify a logical final answer section
       if (reasoningMethod === "cot") {
+        // Look for potential conclusion markers
         const conclusionMarkers = [
           "Therefore", "In conclusion", "So,", "Thus,", "Hence,", 
           "The answer is", "To conclude", "Finally,", "In summary",
           "As a result", "Consequently", "The final answer"
         ];
         
+        // Add a marker for just "Answer:" or "Final answer:" on its own line
         const answerMarkers = [
           /\n(Answer:|Final answer:)/i,
           /^(Answer:|Final answer:)/i,
           /\n(The answer is:|My answer is:|Final answer is:)/i
         ];
         
+        // Try each answer marker pattern
         for (const pattern of answerMarkers) {
           const answerMatch = content.match(pattern);
           if (answerMatch && answerMatch.index !== undefined) {
+            // Found a marker
             const thinking = content.substring(0, answerMatch.index).trim();
             const answer = content.substring(answerMatch.index + answerMatch[0].length).trim();
             
@@ -1358,10 +1369,12 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           }
         }
         
+        // If no explicit answer marker, look for conclusion indicator words
         let lastMarkerIndex = -1;
         let bestMarker = "";
         
         for (const marker of conclusionMarkers) {
+          // Check for the marker near the end of the text (last 40%)
           const startSearchPos = content.length * 0.6;
           const markerIndex = content.indexOf(marker, startSearchPos);
           
@@ -1371,6 +1384,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           }
         }
         
+        // If we found a conclusion marker in a reasonable position
         if (lastMarkerIndex > content.length * 0.6) {
           const thinking = content.substring(0, lastMarkerIndex).trim();
           const answer = content.substring(lastMarkerIndex).trim();
@@ -1382,9 +1396,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           };
         }
         
+        // Last resort: if text has multiple paragraphs, try to use the last paragraph as answer
         const paragraphs = content.split(/\n\s*\n/);
         if (paragraphs.length > 1) {
           const lastParagraph = paragraphs[paragraphs.length - 1].trim();
+          // Only use last paragraph as answer if it's relatively short compared to whole text
           if (lastParagraph.length < content.length * 0.3) {
             const thinking = content.substring(0, content.lastIndexOf(lastParagraph)).trim();
             return {
@@ -1396,6 +1412,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
       }
       
+      // For standard reasoning
       if (reasoningMethod === "standard") {
         return {
           content: content,
@@ -1404,11 +1421,51 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         };
       }
       
+      // Default: if unable to separate, return entire content
       return {
         content: content,
         thinking: reasoningMethod === "cot" || reasoningMethod === "cod" ? content : null,
         answer: reasoningMethod === "standard" ? content : null
       };
+    }
+
+    /***********************
+     * Format Thinking Steps - NEW FUNCTION
+     ***********************/
+    function formatThinkingSteps(thinking) {
+      if (!thinking) return '';
+      
+      // Remove any "###" prefixes
+      let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, '');
+      
+      // Split by periods followed by a space to separate steps
+      let steps = cleanedThinking.split(/\.\s+/);
+      
+      // Join steps with visual separator
+      return steps.filter(step => step.trim())
+        .map(step => 
+          `<div class="step">${step.trim()}${!step.endsWith('.') ? '.' : ''}</div>`
+        ).join('');
+    }
+
+    /***********************
+     * Transform Message
+     ***********************/
+    function transformMessage(content) {
+      // Remove "###" prefixes from lines
+      let processedContent = content.replace(/^#{1,3}\s*/gm, '');
+      
+      // Replace code blocks with syntax highlighting
+      const transformed = processedContent.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
+        let language = '';
+        const lines = codeContent.split('\n');
+        if (lines.length > 0 && !lines[0].includes(' ')) {
+          language = lines[0].trim();
+          lines.shift();
+        }
+        return `<pre><code class="${language}">${lines.join('\n')}</code></pre>`;
+      });
+      return transformed;
     }
 
     /***********************
@@ -1434,10 +1491,12 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           timestampEl.style.marginBottom = "0.5rem";
           messageDiv.appendChild(timestampEl);
 
+          // Special handling for messages with thinking/answer components
           if (msg.sender === "bot" && !msg.isPlaceholder) {
             const messageContainer = document.createElement("div");
             messageContainer.className = "message-container";
             
+            // If we have thinking steps (for CoT or CoD)
             if (msg.thinking) {
               const thinkingDiv = document.createElement("div");
               thinkingDiv.className = "thinking-steps";
@@ -1447,13 +1506,15 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               thinkingLabel.textContent = "Thinking Steps";
               thinkingDiv.appendChild(thinkingLabel);
               
+              // Format thinking steps using the formatted steps function
               const thinkingContent = document.createElement("div");
-              thinkingContent.innerHTML = transformMessage(msg.thinking);
+              thinkingContent.innerHTML = formatThinkingSteps(msg.thinking);
               thinkingDiv.appendChild(thinkingContent);
               
               messageContainer.appendChild(thinkingDiv);
             }
             
+            // If we have an answer (for CoD, CoT or Standard)
             if (msg.answer) {
               const answerDiv = document.createElement("div");
               answerDiv.className = "final-answer";
@@ -1470,6 +1531,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               messageContainer.appendChild(answerDiv);
             }
             
+            // If we have neither thinking nor answer (fall back to content)
             if (!msg.thinking && !msg.answer) {
               const contentEl = document.createElement("div");
               contentEl.innerHTML = transformMessage(msg.content);
@@ -1478,11 +1540,13 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             
             messageDiv.appendChild(messageContainer);
           } else {
+            // Standard rendering for user messages or placeholders
             const contentEl = document.createElement("div");
             contentEl.innerHTML = transformMessage(msg.content);
             messageDiv.appendChild(contentEl);
           }
           
+          // Add word count badge for bot messages (except placeholders)
           if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
             const wordCountBadge = document.createElement("div");
             wordCountBadge.className = "word-count-badge";
@@ -1500,6 +1564,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (thread) {
+        // Process bot messages to separate thinking from answer
         let thinking = null;
         let answer = null;
         
@@ -1536,9 +1601,12 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       
       let systemPrompt = "";
       
+      // If we have a reasoning method other than standard, add the system prompt
       if (REASONING_METHOD !== "standard") {
+        // Use the selected reasoning method prompt
         systemPrompt = PROMPTS[REASONING_METHOD];
         
+        // If it's COD, update the word limit
         if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
           systemPrompt = systemPrompt.replace(/with \d+ words at most/, `with ${COD_WORD_LIMIT} words at most`);
         }
@@ -1553,6 +1621,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         console.log("Using standard reasoning (no special prompt)");
       }
       
+      // Add all user and assistant messages
       thread.messages
         .filter(msg => !msg.isPlaceholder)
         .forEach(msg => {
@@ -1582,8 +1651,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
 
+      // Build messages array with current settings
       const messagesForApi = buildMessagesForChat();
 
+      // Create payload
       const payload = {
         model: MODEL_NAME,
         max_tokens: MAX_TOKENS,
@@ -1599,6 +1670,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
 
       try {
+        // Add timestamp to URL to prevent caching
         const timestamp = new Date().getTime();
         const cacheBuster = `?t=${timestamp}`;
         
@@ -1623,11 +1695,13 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           const trimmedReply = botReply.trim();
           const wordCount = countWords(trimmedReply);
           
+          // Create response metadata
           let reasoningInfo = REASONING_METHOD.toUpperCase();
           if (REASONING_METHOD === "cod") {
             reasoningInfo += `-${COD_WORD_LIMIT}`;
           }
           
+          // Process bot message to separate thinking and answer parts
           const processed = processBotMessage(trimmedReply, REASONING_METHOD);
           
           thread.messages[placeholderIndex] = {
@@ -1655,8 +1729,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       } catch (error) {
         console.error("Error communicating with API:", error);
         
+        // Provide more detailed error message
         let errorMessage = "Error communicating with API: " + error.message;
         
+        // Add suggestions based on error type
         if (error.message.includes("Failed to fetch")) {
           errorMessage += "\n\nPossible solutions:\n1. Make sure your API key is set correctly in Netlify\n2. Check that your model name is valid\n3. Verify your internet connection";
         }
@@ -1704,21 +1780,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       });
     }
 
-    // Updated transformMessage function to remove leading "###" markers for improved readability.
-    function transformMessage(content) {
-      const withoutHashes = content.replace(/^(#+\s*)/gm, '');
-      const transformed = withoutHashes.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-        let language = '';
-        const lines = codeContent.split('\n');
-        if (lines.length > 0 && !lines[0].includes(' ')) {
-          language = lines[0].trim();
-          lines.shift();
-        }
-        return `<pre><code class="${language}">${lines.join('\n')}</code></pre>`;
-      });
-      return transformed;
-    }
-
     /***********************
      * Notification System
      ***********************/
@@ -1736,14 +1797,17 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
      * Feedback Form
      ***********************/
     function initFeedbackForm() {
+      // Get references to elements
       const openBtn = document.getElementById('openFeedbackBtn');
       const modal = document.getElementById('feedbackModal');
       const closeBtn = document.getElementById('closeFeedbackModal');
       const modelInput = document.getElementById('feedbackModel');
       const reasoningInput = document.getElementById('feedbackReasoning');
       
+      // Set up event listeners
       if (openBtn) {
         openBtn.addEventListener('click', () => {
+          // Update hidden fields with current model info
           if (modelInput) modelInput.value = MODEL_NAME_DISPLAY || 'Not set';
           if (reasoningInput) {
             let reasoningMethod = REASONING_METHOD.toUpperCase();
@@ -1753,6 +1817,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             reasoningInput.value = reasoningMethod;
           }
           
+          // Show the modal
           if (modal) modal.style.display = 'block';
         });
       }
@@ -1763,12 +1828,14 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         });
       }
       
+      // Close modal when clicking outside
       window.addEventListener('click', (event) => {
         if (event.target === modal) {
           modal.style.display = 'none';
         }
       });
       
+      // Show success message after form submission
       const form = document.querySelector('form[name="feedback"]');
       if (form) {
         form.addEventListener('submit', () => {
@@ -1783,10 +1850,13 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     /***********************
      * Settings Management
      ***********************/
+    
+    // Tab handling
     function setupTabNavigation() {
       try {
         console.log("Setting up tab navigation");
         
+        // Get all tab buttons and tab contents
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
         
@@ -1794,14 +1864,18 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           console.warn("No tab buttons found");
         }
         
+        // Add click event listeners to tab buttons
         tabButtons.forEach(button => {
           button.addEventListener('click', () => {
             try {
+              // Remove active class from all buttons and contents
               tabButtons.forEach(btn => btn.classList.remove('active'));
               tabContents.forEach(content => content.classList.remove('active'));
               
+              // Add active class to clicked button
               button.classList.add('active');
               
+              // Show corresponding tab content
               const tabId = button.getAttribute('data-tab');
               const tabContent = document.getElementById(tabId);
               if (tabContent) {
@@ -1819,6 +1893,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       }
     }
     
+    // Custom model handling
     function setupModelInput() {
       const modelInput = document.getElementById('modelName');
       const setModelBtn = document.getElementById('setModelBtn');
@@ -1836,16 +1911,19 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       });
     }
     
+    // Setup COD options display
     function setupCODOptions() {
       const reasoningRadios = document.getElementsByName('reasoningMethod');
       const codOptions = document.getElementById('codOptions');
       
+      // Initial state
       if (REASONING_METHOD === 'cod') {
         codOptions.style.display = 'block';
       } else {
         codOptions.style.display = 'none';
       }
       
+      // Update when reasoning method changes
       reasoningRadios.forEach(radio => {
         radio.addEventListener('change', () => {
           if (radio.value === 'cod' && radio.checked) {
@@ -1856,13 +1934,16 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         });
       });
       
+      // Setup word limit dropdown
       const wordLimitSelect = document.getElementById('codWordLimit');
       wordLimitSelect.addEventListener('change', () => {
         COD_WORD_LIMIT = parseInt(wordLimitSelect.value);
       });
     }
     
+    // Settings slider handling
     function setupSliders() {
+      // Connect all sliders to their value displays
       document.querySelectorAll('input[type="range"]').forEach(slider => {
         const valueDisplay = document.getElementById(`${slider.id}Value`);
         if (valueDisplay) {
@@ -1877,44 +1958,332 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       try {
         console.log("Opening settings modal");
         
+        // Initialize settings UI
         const modelNameInput = document.getElementById("modelName");
         if (modelNameInput) modelNameInput.value = MODEL_NAME;
         
+        // Set reasoning method radio buttons
         const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
         if (reasoningRadio) reasoningRadio.checked = true;
         
+        // Set COD word limit
+        const codWordLimit = document.getElementById("codWordLimit");
+        if (codWordLimit) codWordLimit.value = COD_WORD_LIMIT.toString();
+        
+        // Set parameter sliders
+        setSliderAndValue("temp", TEMPERATURE);
+        setSliderAndValue("topP", TOP_P);
+        setSliderAndValue("topK", TOP_K);
+        setSliderAndValue("maxTokens", MAX_TOKENS);
+        setSliderAndValue("presencePenalty", PRESENCE_PENALTY);
+        setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
+        
+        // Show modal
         const modal = document.getElementById("settingsModal");
         if (modal) modal.style.display = "block";
+        
+        console.log("Settings modal opened successfully");
       } catch (err) {
-        console.error("Error opening settings modal:", err);
+        console.error("Error in openSettingsModal:", err);
       }
     }
     
-    window.addEventListener('load', () => {
-      createNewThread();
-      setupTabNavigation();
-      setupModelInput();
-      setupCODOptions();
-      setupSliders();
-      initFeedbackForm();
+    function setSliderAndValue(id, value) {
+      const slider = document.getElementById(id);
+      const valueDisplay = document.getElementById(`${id}Value`);
       
-      document.getElementById('sendBtn').addEventListener('click', () => {
-        const userInput = document.getElementById('userInput');
-        if (userInput && userInput.value.trim() !== "") {
-          sendMessage(userInput.value.trim());
-          userInput.value = "";
+      if (slider) slider.value = value;
+      if (valueDisplay) valueDisplay.textContent = value;
+    }
+
+    function closeSettingsModal() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+
+    function saveSettings() {
+      try {
+        console.log("Saving settings...");
+        
+        // Save previous settings for comparison
+        const prevMethod = REASONING_METHOD;
+        const prevWordLimit = COD_WORD_LIMIT;
+        
+        // Save model name
+        const modelNameEl = document.getElementById("modelName");
+        if (modelNameEl) {
+          MODEL_NAME = modelNameEl.value.trim();
+          MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
         }
-      });
+        
+        // Save reasoning method
+        const reasoningRadios = document.getElementsByName("reasoningMethod");
+        for (const radio of reasoningRadios) {
+          if (radio.checked) {
+            REASONING_METHOD = radio.value;
+            break;
+          }
+        }
+        
+        // Save COD word limit if applicable
+        if (REASONING_METHOD === "cod") {
+          const codWordLimitEl = document.getElementById("codWordLimit");
+          if (codWordLimitEl) {
+            COD_WORD_LIMIT = parseInt(codWordLimitEl.value);
+          }
+        }
+        
+        // Save generation parameters safely
+        const getNumericValue = (id, defaultVal, parseFunc) => {
+          const el = document.getElementById(id);
+          return el ? parseFunc(el.value) : defaultVal;
+        };
+        
+        TEMPERATURE = getNumericValue("temp", 0.5, parseFloat);
+        TOP_P = getNumericValue("topP", 0.9, parseFloat);
+        TOP_K = getNumericValue("topK", 55, parseInt);
+        MAX_TOKENS = getNumericValue("maxTokens", 1112, parseInt);
+        PRESENCE_PENALTY = getNumericValue("presencePenalty", 0, parseFloat);
+        FREQUENCY_PENALTY = getNumericValue("frequencyPenalty", 0.4, parseFloat);
+        
+        // Update model display
+        updateCurrentModelDisplay();
+        
+        // Save settings to localStorage
+        try {
+          localStorage.setItem("modelName", MODEL_NAME);
+          localStorage.setItem("reasoningMethod", REASONING_METHOD);
+          localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
+          localStorage.setItem("temperature", TEMPERATURE.toString());
+          localStorage.setItem("topP", TOP_P.toString());
+          localStorage.setItem("topK", TOP_K.toString());
+          localStorage.setItem("maxTokens", MAX_TOKENS.toString());
+          localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString());
+          localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString());
+          
+          // Save custom prompts
+          localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
+          console.log("Settings saved to localStorage");
+        } catch (storageErr) {
+          console.error("Error saving to localStorage:", storageErr);
+        }
+        
+        closeSettingsModal();
+        
+        // Check if reasoning method or COD word limit changed and notify user
+        if (prevMethod !== REASONING_METHOD || 
+            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT)) {
+          showNotification("Settings saved - reasoning method changed. Next message will use new settings.");
+        } else {
+          showNotification("Settings saved");
+        }
+      } catch (err) {
+        console.error("Error in saveSettings:", err);
+        showNotification("Error saving settings");
+      }
+    }
+
+    /***********************
+     * Event Listeners
+     ***********************/
+    function initEventListeners() {
+      try {
+        console.log("Initializing event listeners");
+        
+        // Helper function to safely add event listeners
+        const addListener = (id, event, handler) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener(event, handler);
+          } else {
+            console.warn(`Element with id "${id}" not found for event listener`);
+          }
+        };
+        
+        // Settings buttons
+        addListener("openSettings", "click", openSettingsModal);
+        addListener("closeSettings", "click", closeSettingsModal);
+        addListener("closeModalX", "click", closeSettingsModal);
+        addListener("saveSettings", "click", saveSettings);
+        
+        // Thread management
+        addListener("newThreadBtn", "click", createNewThread);
+        addListener("deleteThreadBtn", "click", deleteCurrentThread);
+        addListener("downloadTxtBtn", "click", downloadCurrentThreadAsTxt);
+        addListener("downloadPdfBtn", "click", downloadCurrentThreadAsPdf);
+        
+        // Message sending
+        addListener("sendBtn", "click", () => {
+          const userInput = document.getElementById("userInput");
+          if (userInput) {
+            const message = userInput.value.trim();
+            if (message) {
+              sendMessage(message);
+              userInput.value = "";
+            }
+          }
+        });
+        
+        const userInput = document.getElementById("userInput");
+        if (userInput) {
+          userInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              const sendBtn = document.getElementById("sendBtn");
+              if (sendBtn) sendBtn.click();
+            }
+          });
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener("click", (event) => {
+          const modal = document.getElementById("settingsModal");
+          if (modal && event.target === modal) {
+            closeSettingsModal();
+          }
+        });
+        
+        // Set up settings UI functionality
+        setTimeout(() => {
+          try {
+            setupTabNavigation();
+            setupModelInput();
+            setupCODOptions();
+            setupSliders();
+            console.log("UI functionality setup complete");
+          } catch (err) {
+            console.error("Error setting up UI functionality:", err);
+          }
+        }, 100);
+      } catch (err) {
+        console.error("Error initializing event listeners:", err);
+      }
+    }
+
+    /***********************
+     * Initialization
+     ***********************/
+    function loadPersistedSettings() {
+      try {
+        MODEL_NAME = localStorage.getItem("modelName") || "";
+        MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
+        
+        REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
+        
+        const codWordLimit = localStorage.getItem("codWordLimit");
+        if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
+        
+        // Load custom prompts if available
+        const storedPrompts = localStorage.getItem("customPrompts");
+        if (storedPrompts) {
+          const parsedPrompts = JSON.parse(storedPrompts);
+          // Merge with default prompts to ensure all properties exist
+          PROMPTS = { ...PROMPTS, ...parsedPrompts };
+        }
+        
+        const temp = localStorage.getItem("temperature");
+        if (temp) TEMPERATURE = parseFloat(temp);
+        
+        const topP = localStorage.getItem("topP");
+        if (topP) TOP_P = parseFloat(topP);
+        
+        const topK = localStorage.getItem("topK");
+        if (topK) TOP_K = parseInt(topK);
+        
+        const maxTokens = localStorage.getItem("maxTokens");
+        if (maxTokens) MAX_TOKENS = parseInt(maxTokens);
+        
+        const presencePenalty = localStorage.getItem("presencePenalty");
+        if (presencePenalty) PRESENCE_PENALTY = parseFloat(presencePenalty);
+        
+        const frequencyPenalty = localStorage.getItem("frequencyPenalty");
+        if (frequencyPenalty) FREQUENCY_PENALTY = parseFloat(frequencyPenalty);
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      }
+    }
+
+    function init() {
+      console.log("Initializing app...");
       
-      document.getElementById('newThreadBtn').addEventListener('click', createNewThread);
-      document.getElementById('deleteThreadBtn').addEventListener('click', deleteCurrentThread);
-      document.getElementById('downloadTxtBtn').addEventListener('click', downloadCurrentThreadAsTxt);
-      document.getElementById('downloadPdfBtn').addEventListener('click', downloadCurrentThreadAsPdf);
-      document.getElementById('openSettings').addEventListener('click', openSettingsModal);
-      document.getElementById('closeSettings').addEventListener('click', () => {
-        document.getElementById("settingsModal").style.display = "none";
-      });
-    });
+      try {
+        loadPersistedSettings();
+        console.log("Settings loaded");
+        
+        createNewThread();
+        console.log("New thread created");
+        
+        initEventListeners();
+        console.log("Event listeners initialized");
+        
+        updateCurrentModelDisplay();
+        console.log("Model display updated");
+        
+        // Initialize feedback form
+        initFeedbackForm();
+        console.log("Feedback form initialized");
+        
+        // Helper function to create a button that resets the thread
+        function createClearThreadButton() {
+          const clearThreadBtn = document.createElement("button");
+          clearThreadBtn.id = "clearThreadBtn";
+          clearThreadBtn.textContent = "Clear Thread";
+          clearThreadBtn.style.marginTop = "0.5rem";
+          clearThreadBtn.style.backgroundColor = "#553333";
+          clearThreadBtn.addEventListener("click", () => {
+            if (confirm("Clear all messages in this thread?")) {
+              const thread = threads.find(t => t.id === currentThreadId);
+              if (thread) {
+                thread.messages = [];
+                renderCurrentThreadMessages();
+                showNotification("Thread cleared");
+              }
+            }
+          });
+          return clearThreadBtn;
+        }
+        
+        // Add clear thread button to the sidebar
+        const sidebar = document.querySelector(".sidebar");
+        if (sidebar) {
+          sidebar.appendChild(createClearThreadButton());
+        }
+        
+        // If we don't have a model name, open settings modal
+        if (!MODEL_NAME) {
+          console.log("No model name found, opening settings");
+          setTimeout(() => {
+            try {
+              openSettingsModal();
+              console.log("Settings modal opened");
+            } catch (err) {
+              console.error("Error opening settings modal:", err);
+            }
+          }, 1000);
+        }
+      } catch (err) {
+        console.error("Initialization error:", err);
+      }
+    }
+
+    // Initialize the application
+    document.addEventListener("DOMContentLoaded", init);
+    
+    // Backup initialization - in case the DOMContentLoaded event already fired
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      setTimeout(init, 1);
+    }
   </script>
+  <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="feedback">
+  <input type="hidden" name="model">
+  <input type="hidden" name="reasoning_method">
+  <select name="feedback_type"></select>
+  <input type="radio" name="rating" value="1">
+  <input type="radio" name="rating" value="2">
+  <input type="radio" name="rating" value="3">
+  <input type="radio" name="rating" value="4">
+  <input type="radio" name="rating" value="5">
+  <textarea name="comments"></textarea>
+</form>
 </body>
 </html>
