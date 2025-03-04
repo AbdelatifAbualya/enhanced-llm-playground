@@ -2248,5 +2248,17 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       setTimeout(init, 1);
     }
   </script>
+  <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="feedback">
+  <input type="hidden" name="model">
+  <input type="hidden" name="reasoning_method">
+  <select name="feedback_type"></select>
+  <input type="radio" name="rating" value="1">
+  <input type="radio" name="rating" value="2">
+  <input type="radio" name="rating" value="3">
+  <input type="radio" name="rating" value="4">
+  <input type="radio" name="rating" value="5">
+  <textarea name="comments"></textarea>
+</form>
 </body>
 </html>
