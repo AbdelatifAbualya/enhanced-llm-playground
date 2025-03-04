@@ -174,8 +174,8 @@
     -------------------------------- */
     .message {
       clear: both;
-      margin-bottom: 1rem;
-      max-width: 70%;
+      margin-bottom: 1.5rem;
+      max-width: 80%;
       padding: 0.75rem 1rem;
       border-radius: 12px;
       line-height: 1.4;
@@ -184,53 +184,67 @@
       border: 1px solid #444;
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
       position: relative;
+      overflow: hidden;
     }
     .message.user {
       float: right;
       background-color: #3a3a3a;
-      margin-left: 25%;
+      margin-left: 20%;
     }
     .message.bot {
       float: left;
       background-color: #2e2e2e;
-      margin-right: 25%;
+      margin-right: 20%;
     }
     .message.bot.placeholder {
       font-style: italic;
       color: #888;
     }
-    /* NEW: Thinking steps and final answer styling */
+    /* NEW IMPROVED: Thinking steps and final answer styling */
+    .message-container {
+      width: 100%;
+      overflow: hidden;
+    }
     .thinking-steps {
       background-color: #252525;
       border: 1px solid #333;
       border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
-      font-family: monospace;
-      font-size: 0.9rem;
+      padding: 15px;
+      margin-bottom: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
       color: #aaa;
+      white-space: pre-wrap;
+      overflow-x: auto;
     }
     .thinking-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      font-family: 'Roboto', sans-serif;
       color: #777;
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-weight: bold;
+      border-bottom: 1px dotted #555;
+      padding-bottom: 5px;
     }
     .final-answer {
       background-color: #2d3748;
       border: 1px solid #4a5568;
       border-radius: 8px;
-      padding: 10px;
+      padding: 15px;
+      margin-top: 5px;
       color: #edf2f7;
     }
     .final-answer-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #90cdf4;
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: bold;
+      border-bottom: 1px dotted #5a7299;
+      padding-bottom: 5px;
     }
     .step {
       border-left: 2px solid #3a4a5c;
@@ -848,6 +862,80 @@
     </div>
   </div>
 
+  <!-- Feedback Button and Modal -->
+  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
+    <button id="openFeedbackBtn" style="background-color: #4a8cff; color: white; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+      <span style="margin-right: 5px;">💬</span> Feedback
+    </button>
+  </div>
+
+  <div id="feedbackModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="close-modal" id="closeFeedbackModal">&times;</button>
+      <h2>Share Your Feedback</h2>
+      
+      <form name="feedback" method="POST" data-netlify="true">
+        <input type="hidden" name="form-name" value="feedback">
+        
+        <input type="hidden" id="feedbackModel" name="model">
+        <input type="hidden" id="feedbackReasoning" name="reasoning_method">
+        
+        <label for="feedbackType">Feedback Type:</label>
+        <select id="feedbackType" name="feedback_type" style="width: 100%; margin-bottom: 15px;">
+          <option value="general">General Feedback</option>
+          <option value="bug">Report a Bug</option>
+          <option value="feature">Feature Request</option>
+          <option value="model_performance">Model Performance</option>
+        </select>
+        
+        <label>How would you rate your experience?</label>
+        <div style="display: flex; justify-content: space-between; margin: 10px 0 15px 0;">
+          <label style="flex: 1; text-align: center;">
+            <input type="radio" name="rating" value="1" required>
+            <div>😞</div>
+            <div style="font-size: 0.8rem;">Poor</div>
+          </label>
+          <label style="flex: 1; text-align: center;">
+            <input type="radio" name="rating" value="2">
+            <div>😐</div>
+            <div style="font-size: 0.8rem;">Fair</div>
+          </label>
+          <label style="flex: 1; text-align: center;">
+            <input type="radio" name="rating" value="3">
+            <div>🙂</div>
+            <div style="font-size: 0.8rem;">Good</div>
+          </label>
+          <label style="flex: 1; text-align: center;">
+            <input type="radio" name="rating" value="4">
+            <div>😀</div>
+            <div style="font-size: 0.8rem;">Great</div>
+          </label>
+          <label style="flex: 1; text-align: center;">
+            <input type="radio" name="rating" value="5">
+            <div>🤩</div>
+            <div style="font-size: 0.8rem;">Excellent</div>
+          </label>
+        </div>
+        
+        <label for="feedbackComments">Comments:</label>
+        <textarea 
+          id="feedbackComments" 
+          name="comments" 
+          rows="4" 
+          style="width: 100%; background-color: #2e2e2e; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 10px; margin-bottom: 20px;"
+          required
+        ></textarea>
+        
+        <button 
+          type="submit" 
+          style="background-color: #4a8cff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right;"
+        >
+          Submit Feedback
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script>
     /***********************
      * Global Configuration
@@ -1129,53 +1217,60 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         yPos += lineHeight;
 
         // Special handling for messages with thinking/answer components
-        if (msg.sender === "bot" && msg.thinking && msg.answer) {
-          doc.setFont("helvetica", "italic");
-          doc.setFontSize(9);
-          doc.setTextColor(180, 180, 180);
-          doc.text("THINKING STEPS:", leftMargin, yPos);
-          yPos += lineHeight;
-          
-          doc.setFont("courier", "normal");
-          const thinkingLines = msg.thinking.split(/\r?\n/);
-          thinkingLines.forEach(line => {
-            if (yPos > 720) {
-              doc.addPage();
-              setPageBackground(doc);
-              yPos = 40;
-            }
-            const wrapped = doc.splitTextToSize(line, 520);
-            wrapped.forEach(wLine => {
-              doc.text(wLine, leftMargin + 10, yPos);
-              yPos += lineHeight;
+        if (msg.sender === "bot" && !msg.isPlaceholder && (msg.thinking || msg.answer)) {
+          // If we have thinking steps, render them
+          if (msg.thinking) {
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(9);
+            doc.setTextColor(180, 180, 180);
+            doc.text("THINKING STEPS:", leftMargin, yPos);
+            yPos += lineHeight;
+            
+            doc.setFont("courier", "normal");
+            const thinkingLines = msg.thinking.split(/\r?\n/);
+            thinkingLines.forEach(line => {
+              if (yPos > 720) {
+                doc.addPage();
+                setPageBackground(doc);
+                yPos = 40;
+              }
+              const wrapped = doc.splitTextToSize(line, 520);
+              wrapped.forEach(wLine => {
+                doc.text(wLine, leftMargin + 10, yPos);
+                yPos += lineHeight;
+              });
             });
-          });
+            
+            yPos += lineHeight/2;
+          }
           
-          yPos += lineHeight/2;
-          
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(9);
-          doc.setTextColor(144, 205, 244);
-          doc.text("FINAL ANSWER:", leftMargin, yPos);
-          yPos += lineHeight;
-          
-          doc.setFont("helvetica", "normal");
-          doc.setTextColor(224, 224, 224);
-          doc.setFontSize(10);
-          const answerLines = msg.answer.split(/\r?\n/);
-          answerLines.forEach(line => {
-            if (yPos > 720) {
-              doc.addPage();
-              setPageBackground(doc);
-              yPos = 40;
-            }
-            const wrapped = doc.splitTextToSize(line, 520);
-            wrapped.forEach(wLine => {
-              doc.text(wLine, leftMargin + 10, yPos);
-              yPos += lineHeight;
+          // If we have an answer, render it
+          if (msg.answer) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(144, 205, 244);
+            doc.text("FINAL ANSWER:", leftMargin, yPos);
+            yPos += lineHeight;
+            
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(224, 224, 224);
+            doc.setFontSize(10);
+            const answerLines = msg.answer.split(/\r?\n/);
+            answerLines.forEach(line => {
+              if (yPos > 720) {
+                doc.addPage();
+                setPageBackground(doc);
+                yPos = 40;
+              }
+              const wrapped = doc.splitTextToSize(line, 520);
+              wrapped.forEach(wLine => {
+                doc.text(wLine, leftMargin + 10, yPos);
+                yPos += lineHeight;
+              });
             });
-          });
+          }
         } else {
+          // Standard rendering for other messages
           const parsed = parseContentForExport(msg.content);
           parsed.forEach(item => {
             if (item.type === 'text') {
@@ -1224,43 +1319,87 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
      * Process Bot Messages
      ***********************/
     function processBotMessage(content, reasoningMethod) {
-      // If not in CoD mode or content doesn't have the separator, return as is
-      if (reasoningMethod !== "cod" || !content.includes("####")) {
-        // For CoT, keep the message as is
-        if (reasoningMethod === "cot") {
+      // For Chain of Draft (CoD) mode, look for the #### separator
+      if (reasoningMethod === "cod") {
+        const separatorIndex = content.indexOf("####");
+        if (separatorIndex !== -1) {
+          // Extract thinking steps and final answer
+          let thinking = content.substring(0, separatorIndex).trim();
+          let answer = content.substring(separatorIndex + 4).trim();
+          
           return {
             content: content,
-            thinking: content,
-            answer: null  // No separate answer for CoT
+            thinking: thinking,
+            answer: answer
           };
         }
+      }
+      
+      // For Chain of Thought (CoT) mode, try to identify a logical final answer section
+      if (reasoningMethod === "cot") {
+        // Look for potential conclusion markers
+        const markers = [
+          "Therefore", "In conclusion", "So,", "Thus,", "Hence,", 
+          "The answer is", "To conclude", "Finally,", "In summary",
+          "As a result", "Consequently", "The final answer"
+        ];
+        
+        // Add a marker for just "Answer:" on its own line
+        const answerMarker = /\n(Answer:|Final answer:)/i;
+        const answerMatch = content.match(answerMarker);
+        
+        if (answerMatch && answerMatch.index > 0) {
+          // Found an "Answer:" marker on its own line
+          const thinking = content.substring(0, answerMatch.index).trim();
+          const answer = content.substring(answerMatch.index + 1).trim();
+          
+          return {
+            content: content,
+            thinking: thinking,
+            answer: answer
+          };
+        }
+        
+        // Try to find the last occurrence of any conclusion marker
+        let lastMarkerIndex = -1;
+        let lastMarker = "";
+        
+        markers.forEach(marker => {
+          // Look for the marker followed by space or punctuation
+          const markerIndex = content.lastIndexOf(marker);
+          if (markerIndex > lastMarkerIndex) {
+            lastMarkerIndex = markerIndex;
+            lastMarker = marker;
+          }
+        });
+        
+        // If we found a marker in a reasonable position (not too early in the text)
+        if (lastMarkerIndex > content.length * 0.5) {
+          const thinking = content.substring(0, lastMarkerIndex).trim();
+          const answer = content.substring(lastMarkerIndex).trim();
+          
+          return {
+            content: content,
+            thinking: thinking,
+            answer: answer
+          };
+        }
+      }
+      
+      // For standard reasoning or if no clear separation is found
+      if (reasoningMethod === "standard") {
         return {
           content: content,
           thinking: null,
-          answer: null
+          answer: content
         };
       }
       
-      // For CoD mode, split by the separator
-      const parts = content.split("####");
-      if (parts.length >= 2) {
-        const thinking = parts[0].trim();
-        const answer = parts.slice(1).join("####").trim();  // In case there are multiple #### separators
-        
-        // Return both the full content (for backward compatibility)
-        // and the separated thinking/answer parts
-        return {
-          content: content,
-          thinking: thinking,
-          answer: answer
-        };
-      }
-      
-      // Fallback for malformed responses
+      // Default: treat entire content as thinking for CoT or content for standard
       return {
         content: content,
-        thinking: null,
-        answer: null
+        thinking: reasoningMethod === "cot" ? content : null,
+        answer: reasoningMethod === "cot" ? null : content
       };
     }
 
@@ -1288,8 +1427,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           messageDiv.appendChild(timestampEl);
 
           // Special handling for messages with thinking/answer components
-          if (msg.sender === "bot" && !msg.isPlaceholder && (msg.thinking || msg.answer)) {
-            // If we have thinking steps, render them
+          if (msg.sender === "bot" && !msg.isPlaceholder) {
+            const messageContainer = document.createElement("div");
+            messageContainer.className = "message-container";
+            
+            // If we have thinking steps (for CoT or CoD)
             if (msg.thinking) {
               const thinkingDiv = document.createElement("div");
               thinkingDiv.className = "thinking-steps";
@@ -1299,28 +1441,15 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               thinkingLabel.textContent = "Thinking Steps";
               thinkingDiv.appendChild(thinkingLabel);
               
-              // Split thinking steps and format them
-              const steps = msg.thinking.split(/\.\s+|\n+/).filter(step => step.trim().length > 0);
+              // Format thinking steps
+              const thinkingContent = document.createElement("div");
+              thinkingContent.innerHTML = transformMessage(msg.thinking);
+              thinkingDiv.appendChild(thinkingContent);
               
-              if (steps.length > 1) {
-                // If multiple steps, format them as a numbered list
-                steps.forEach((step, index) => {
-                  const stepDiv = document.createElement("div");
-                  stepDiv.className = "step";
-                  stepDiv.textContent = `${index + 1}. ${step.trim()}${step.trim().endsWith('.') ? '' : '.'}`;
-                  thinkingDiv.appendChild(stepDiv);
-                });
-              } else {
-                // If just one step or couldn't split properly, use the whole thinking text
-                const fullThinking = document.createElement("div");
-                fullThinking.innerHTML = transformMessage(msg.thinking);
-                thinkingDiv.appendChild(fullThinking);
-              }
-              
-              messageDiv.appendChild(thinkingDiv);
+              messageContainer.appendChild(thinkingDiv);
             }
             
-            // If we have an answer, render it
+            // If we have an answer (for CoD or Standard)
             if (msg.answer) {
               const answerDiv = document.createElement("div");
               answerDiv.className = "final-answer";
@@ -1334,10 +1463,19 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               answerContent.innerHTML = transformMessage(msg.answer);
               answerDiv.appendChild(answerContent);
               
-              messageDiv.appendChild(answerDiv);
+              messageContainer.appendChild(answerDiv);
             }
+            
+            // If we have neither thinking nor answer (fall back to content)
+            if (!msg.thinking && !msg.answer) {
+              const contentEl = document.createElement("div");
+              contentEl.innerHTML = transformMessage(msg.content);
+              messageContainer.appendChild(contentEl);
+            }
+            
+            messageDiv.appendChild(messageContainer);
           } else {
-            // Standard rendering for other messages
+            // Standard rendering for user messages or placeholders
             const contentEl = document.createElement("div");
             contentEl.innerHTML = transformMessage(msg.content);
             messageDiv.appendChild(contentEl);
@@ -1605,6 +1743,60 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
+     * Feedback Form
+     ***********************/
+    function initFeedbackForm() {
+      // Get references to elements
+      const openBtn = document.getElementById('openFeedbackBtn');
+      const modal = document.getElementById('feedbackModal');
+      const closeBtn = document.getElementById('closeFeedbackModal');
+      const modelInput = document.getElementById('feedbackModel');
+      const reasoningInput = document.getElementById('feedbackReasoning');
+      
+      // Set up event listeners
+      if (openBtn) {
+        openBtn.addEventListener('click', () => {
+          // Update hidden fields with current model info
+          if (modelInput) modelInput.value = MODEL_NAME_DISPLAY || 'Not set';
+          if (reasoningInput) {
+            let reasoningMethod = REASONING_METHOD.toUpperCase();
+            if (REASONING_METHOD === 'cod') {
+              reasoningMethod += `-${COD_WORD_LIMIT}`;
+            }
+            reasoningInput.value = reasoningMethod;
+          }
+          
+          // Show the modal
+          if (modal) modal.style.display = 'block';
+        });
+      }
+      
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          if (modal) modal.style.display = 'none';
+        });
+      }
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+      
+      // Show success message after form submission
+      const form = document.querySelector('form[name="feedback"]');
+      if (form) {
+        form.addEventListener('submit', () => {
+          setTimeout(() => {
+            showNotification('Thank you for your feedback!');
+            if (modal) modal.style.display = 'none';
+          }, 500);
+        });
+      }
+    }
+
+    /***********************
      * Settings Management
      ***********************/
     
@@ -1696,10 +1888,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       wordLimitSelect.addEventListener('change', () => {
         COD_WORD_LIMIT = parseInt(wordLimitSelect.value);
       });
-    }
-    
-    function setupCustomPromptEditor() {
-      // Function removed as custom prompts section was removed
     }
     
     // Settings slider handling
@@ -1979,6 +2167,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         updateCurrentModelDisplay();
         console.log("Model display updated");
         
+        // Initialize feedback form
+        initFeedbackForm();
+        console.log("Feedback form initialized");
+        
         // Helper function to create a button that resets the thread
         function createClearThreadButton() {
           const clearThreadBtn = document.createElement("button");
@@ -2031,151 +2223,4 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
   </script>
 </body>
-  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
-  <button id="openFeedbackBtn" style="background-color: #4a8cff; color: white; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-    <span style="margin-right: 5px;">💬</span> Feedback
-  </button>
-</div>
-
-<!-- Feedback Modal -->
-<div id="feedbackModal" class="modal" style="display: none;">
-  <div class="modal-content" style="max-width: 500px;">
-    <button class="close-modal" id="closeFeedbackModal">&times;</button>
-    <h2>Share Your Feedback</h2>
-    
-    <!-- This is the Netlify Form -->
-    <form name="feedback" method="POST" data-netlify="true">
-      <input type="hidden" name="form-name" value="feedback">
-      
-      <!-- Current Model Info (hidden fields) -->
-      <input type="hidden" id="feedbackModel" name="model">
-      <input type="hidden" id="feedbackReasoning" name="reasoning_method">
-      
-      <!-- Feedback Type -->
-      <label for="feedbackType">Feedback Type:</label>
-      <select id="feedbackType" name="feedback_type" style="width: 100%; margin-bottom: 15px;">
-        <option value="general">General Feedback</option>
-        <option value="bug">Report a Bug</option>
-        <option value="feature">Feature Request</option>
-        <option value="model_performance">Model Performance</option>
-      </select>
-      
-      <!-- Rating -->
-      <label>How would you rate your experience?</label>
-      <div style="display: flex; justify-content: space-between; margin: 10px 0 15px 0;">
-        <label style="flex: 1; text-align: center;">
-          <input type="radio" name="rating" value="1" required>
-          <div>😞</div>
-          <div style="font-size: 0.8rem;">Poor</div>
-        </label>
-        <label style="flex: 1; text-align: center;">
-          <input type="radio" name="rating" value="2">
-          <div>😐</div>
-          <div style="font-size: 0.8rem;">Fair</div>
-        </label>
-        <label style="flex: 1; text-align: center;">
-          <input type="radio" name="rating" value="3">
-          <div>🙂</div>
-          <div style="font-size: 0.8rem;">Good</div>
-        </label>
-        <label style="flex: 1; text-align: center;">
-          <input type="radio" name="rating" value="4">
-          <div>😀</div>
-          <div style="font-size: 0.8rem;">Great</div>
-        </label>
-        <label style="flex: 1; text-align: center;">
-          <input type="radio" name="rating" value="5">
-          <div>🤩</div>
-          <div style="font-size: 0.8rem;">Excellent</div>
-        </label>
-      </div>
-      
-      <!-- Comments -->
-      <label for="feedbackComments">Comments:</label>
-      <textarea 
-        id="feedbackComments" 
-        name="comments" 
-        rows="4" 
-        style="width: 100%; background-color: #2e2e2e; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 10px; margin-bottom: 20px;"
-        required
-      ></textarea>
-      
-      <!-- Submit Button -->
-      <button 
-        type="submit" 
-        style="background-color: #4a8cff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right;"
-      >
-        Submit Feedback
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- Add this JavaScript right before the closing </body> tag, after the HTML above -->
-<script>
-  // Initialize feedback form functionality
-  function initFeedbackForm() {
-    // Get references to elements
-    const openBtn = document.getElementById('openFeedbackBtn');
-    const modal = document.getElementById('feedbackModal');
-    const closeBtn = document.getElementById('closeFeedbackModal');
-    const modelInput = document.getElementById('feedbackModel');
-    const reasoningInput = document.getElementById('feedbackReasoning');
-    
-    // Set up event listeners
-    if (openBtn) {
-      openBtn.addEventListener('click', () => {
-        // Update hidden fields with current model info
-        if (modelInput) modelInput.value = MODEL_NAME_DISPLAY || 'Not set';
-        if (reasoningInput) {
-          let reasoningMethod = REASONING_METHOD.toUpperCase();
-          if (REASONING_METHOD === 'cod') {
-            reasoningMethod += `-${COD_WORD_LIMIT}`;
-          }
-          reasoningInput.value = reasoningMethod;
-        }
-        
-        // Show the modal
-        if (modal) modal.style.display = 'block';
-      });
-    }
-    
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        if (modal) modal.style.display = 'none';
-      });
-    }
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-    
-    // Show success message after form submission
-    const form = document.querySelector('form[name="feedback"]');
-    if (form) {
-      form.addEventListener('submit', () => {
-        setTimeout(() => {
-          showNotification('Thank you for your feedback!');
-          if (modal) modal.style.display = 'none';
-        }, 500);
-      });
-    }
-  }
-  
-  // Call this in your existing init function
-  document.addEventListener('DOMContentLoaded', () => {
-    // Your existing initialization code runs first
-    
-    // Then initialize the feedback form
-    setTimeout(initFeedbackForm, 1000);
-  });
-  
-  // Or if you need to ensure it runs after your main init
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(initFeedbackForm, 2000);
-  }
-</script>
 </html>
