@@ -3,5 +3,6 @@
   "version": "1.0.0",
   "description": "LLM Playground for comparing Chain of Thought and Chain of Draft reasoning",
   "dependencies": {
-    "node-fetch": "^2.2.*"
+    "node-fetch": "^2.6.7"
   }
+}
