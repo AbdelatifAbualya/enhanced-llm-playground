@@ -200,7 +200,7 @@
       font-style: italic;
       color: #888;
     }
-    /* NEW IMPROVED: Thinking steps and final answer styling */
+    /* IMPROVED: Thinking steps and final answer styling */
     .message-container {
       width: 100%;
       overflow: hidden;
@@ -1316,7 +1316,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Process Bot Messages
+     * Process Bot Messages - IMPROVED VERSION
      ***********************/
     function processBotMessage(content, reasoningMethod) {
       // For Chain of Draft (CoD) mode, look for the #### separator
@@ -1338,43 +1338,52 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       // For Chain of Thought (CoT) mode, try to identify a logical final answer section
       if (reasoningMethod === "cot") {
         // Look for potential conclusion markers
-        const markers = [
+        const conclusionMarkers = [
           "Therefore", "In conclusion", "So,", "Thus,", "Hence,", 
           "The answer is", "To conclude", "Finally,", "In summary",
           "As a result", "Consequently", "The final answer"
         ];
         
-        // Add a marker for just "Answer:" on its own line
-        const answerMarker = /\n(Answer:|Final answer:)/i;
-        const answerMatch = content.match(answerMarker);
+        // Add a marker for just "Answer:" or "Final answer:" on its own line
+        const answerMarkers = [
+          /\n(Answer:|Final answer:)/i,
+          /^(Answer:|Final answer:)/i,
+          /\n(The answer is:|My answer is:|Final answer is:)/i
+        ];
         
-        if (answerMatch && answerMatch.index > 0) {
-          // Found an "Answer:" marker on its own line
-          const thinking = content.substring(0, answerMatch.index).trim();
-          const answer = content.substring(answerMatch.index + 1).trim();
-          
-          return {
-            content: content,
-            thinking: thinking,
-            answer: answer
-          };
+        // Try each answer marker pattern
+        for (const pattern of answerMarkers) {
+          const answerMatch = content.match(pattern);
+          if (answerMatch && answerMatch.index !== undefined) {
+            // Found a marker
+            const thinking = content.substring(0, answerMatch.index).trim();
+            const answer = content.substring(answerMatch.index + answerMatch[0].length).trim();
+            
+            return {
+              content: content,
+              thinking: thinking,
+              answer: answer
+            };
+          }
         }
         
-        // Try to find the last occurrence of any conclusion marker
+        // If no explicit answer marker, look for conclusion indicator words
         let lastMarkerIndex = -1;
-        let lastMarker = "";
+        let bestMarker = "";
         
-        markers.forEach(marker => {
-          // Look for the marker followed by space or punctuation
-          const markerIndex = content.lastIndexOf(marker);
-          if (markerIndex > lastMarkerIndex) {
+        for (const marker of conclusionMarkers) {
+          // Check for the marker near the end of the text (last 40%)
+          const startSearchPos = content.length * 0.6;
+          const markerIndex = content.indexOf(marker, startSearchPos);
+          
+          if (markerIndex > lastMarkerIndex && markerIndex !== -1) {
             lastMarkerIndex = markerIndex;
-            lastMarker = marker;
+            bestMarker = marker;
           }
-        });
+        }
         
-        // If we found a marker in a reasonable position (not too early in the text)
-        if (lastMarkerIndex > content.length * 0.5) {
+        // If we found a conclusion marker in a reasonable position
+        if (lastMarkerIndex > content.length * 0.6) {
           const thinking = content.substring(0, lastMarkerIndex).trim();
           const answer = content.substring(lastMarkerIndex).trim();
           
@@ -1384,27 +1393,42 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             answer: answer
           };
         }
+        
+        // Last resort: if text has multiple paragraphs, try to use the last paragraph as answer
+        const paragraphs = content.split(/\n\s*\n/);
+        if (paragraphs.length > 1) {
+          const lastParagraph = paragraphs[paragraphs.length - 1].trim();
+          // Only use last paragraph as answer if it's relatively short compared to whole text
+          if (lastParagraph.length < content.length * 0.3) {
+            const thinking = content.substring(0, content.lastIndexOf(lastParagraph)).trim();
+            return {
+              content: content,
+              thinking: thinking,
+              answer: lastParagraph
+            };
+          }
+        }
       }
       
-      // For standard reasoning or if no clear separation is found
+      // For standard reasoning
       if (reasoningMethod === "standard") {
         return {
           content: content,
-          thinking: null,
+          thinking: null, 
           answer: content
         };
       }
       
-      // Default: treat entire content as thinking for CoT or content for standard
+      // Default: if unable to separate, return entire content
       return {
         content: content,
-        thinking: reasoningMethod === "cot" ? content : null,
-        answer: reasoningMethod === "cot" ? null : content
+        thinking: reasoningMethod === "cot" || reasoningMethod === "cod" ? content : null,
+        answer: reasoningMethod === "standard" ? content : null
       };
     }
 
     /***********************
-     * Rendering Messages
+     * Rendering Messages - IMPROVED VERSION
      ***********************/
     function renderCurrentThreadMessages() {
       const chatMessagesDiv = document.getElementById("chatMessages");
@@ -1449,7 +1473,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               messageContainer.appendChild(thinkingDiv);
             }
             
-            // If we have an answer (for CoD or Standard)
+            // If we have an answer (for CoD, CoT or Standard)
             if (msg.answer) {
               const answerDiv = document.createElement("div");
               answerDiv.className = "final-answer";
