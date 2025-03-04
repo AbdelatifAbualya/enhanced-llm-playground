@@ -199,6 +199,44 @@
       font-style: italic;
       color: #888;
     }
+    /* NEW: Thinking steps and final answer styling */
+    .thinking-steps {
+      background-color: #252525;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .thinking-label {
+      font-size: 0.75rem;
+      color: #777;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .final-answer {
+      background-color: #2d3748;
+      border: 1px solid #4a5568;
+      border-radius: 8px;
+      padding: 10px;
+      color: #edf2f7;
+    }
+    .final-answer-label {
+      font-size: 0.75rem;
+      color: #90cdf4;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+    .step {
+      border-left: 2px solid #3a4a5c;
+      padding-left: 10px;
+      margin-bottom: 8px;
+    }
     .word-count-badge {
       position: absolute;
       top: -10px;
@@ -1005,19 +1043,25 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         }
         
         content += `${headerInfo}:\n`;
-        const parsed = parseContentForExport(msg.content);
-        parsed.forEach(item => {
-          if (item.type === 'text') {
-            content += item.content + '\n';
-          } else if (item.type === 'code') {
-            const lang = item.language ? ` (${item.language})` : '';
-            content += `----- CODE BLOCK START${lang} -----\n`;
-            item.content.forEach(line => {
-              content += `  ${line}\n`;
-            });
-            content += `----- CODE BLOCK END -----\n`;
-          }
-        });
+        
+        // Special handling for messages with thinking/answer components
+        if (msg.sender === "bot" && msg.thinking && msg.answer) {
+          content += `THINKING STEPS:\n${msg.thinking}\n\nFINAL ANSWER:\n${msg.answer}\n`;
+        } else {
+          const parsed = parseContentForExport(msg.content);
+          parsed.forEach(item => {
+            if (item.type === 'text') {
+              content += item.content + '\n';
+            } else if (item.type === 'code') {
+              const lang = item.language ? ` (${item.language})` : '';
+              content += `----- CODE BLOCK START${lang} -----\n`;
+              item.content.forEach(line => {
+                content += `  ${line}\n`;
+              });
+              content += `----- CODE BLOCK END -----\n`;
+            }
+          });
+        }
         content += '\n';
       });
 
@@ -1084,47 +1128,140 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         doc.text(sender, leftMargin, yPos);
         yPos += lineHeight;
 
-        const parsed = parseContentForExport(msg.content);
-        parsed.forEach(item => {
-          if (item.type === 'text') {
-            doc.setFont("helvetica", "normal");
-            const line = item.content;
+        // Special handling for messages with thinking/answer components
+        if (msg.sender === "bot" && msg.thinking && msg.answer) {
+          doc.setFont("helvetica", "italic");
+          doc.setFontSize(9);
+          doc.setTextColor(180, 180, 180);
+          doc.text("THINKING STEPS:", leftMargin, yPos);
+          yPos += lineHeight;
+          
+          doc.setFont("courier", "normal");
+          const thinkingLines = msg.thinking.split(/\r?\n/);
+          thinkingLines.forEach(line => {
             if (yPos > 720) {
               doc.addPage();
               setPageBackground(doc);
               yPos = 40;
             }
-            const wrapped = doc.splitTextToSize(line, 540);
+            const wrapped = doc.splitTextToSize(line, 520);
             wrapped.forEach(wLine => {
-              doc.text(wLine, leftMargin, yPos);
+              doc.text(wLine, leftMargin + 10, yPos);
               yPos += lineHeight;
             });
-          } else if (item.type === 'code') {
-            doc.setFont("helvetica", "bold");
-            const lang = item.language ? ` (${item.language})` : '';
-            doc.text(`Code Block${lang}:`, leftMargin, yPos);
-            yPos += lineHeight;
-
-            doc.setFont("courier", "normal");
-            item.content.forEach(codeLine => {
+          });
+          
+          yPos += lineHeight/2;
+          
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          doc.setTextColor(144, 205, 244);
+          doc.text("FINAL ANSWER:", leftMargin, yPos);
+          yPos += lineHeight;
+          
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(224, 224, 224);
+          doc.setFontSize(10);
+          const answerLines = msg.answer.split(/\r?\n/);
+          answerLines.forEach(line => {
+            if (yPos > 720) {
+              doc.addPage();
+              setPageBackground(doc);
+              yPos = 40;
+            }
+            const wrapped = doc.splitTextToSize(line, 520);
+            wrapped.forEach(wLine => {
+              doc.text(wLine, leftMargin + 10, yPos);
+              yPos += lineHeight;
+            });
+          });
+        } else {
+          const parsed = parseContentForExport(msg.content);
+          parsed.forEach(item => {
+            if (item.type === 'text') {
+              doc.setFont("helvetica", "normal");
+              const line = item.content;
               if (yPos > 720) {
                 doc.addPage();
                 setPageBackground(doc);
                 yPos = 40;
               }
-              const wrapped = doc.splitTextToSize(codeLine, 520);
+              const wrapped = doc.splitTextToSize(line, 540);
               wrapped.forEach(wLine => {
-                doc.text(wLine, leftMargin + 20, yPos);
+                doc.text(wLine, leftMargin, yPos);
                 yPos += lineHeight;
               });
-            });
-          }
-        });
+            } else if (item.type === 'code') {
+              doc.setFont("helvetica", "bold");
+              const lang = item.language ? ` (${item.language})` : '';
+              doc.text(`Code Block${lang}:`, leftMargin, yPos);
+              yPos += lineHeight;
+
+              doc.setFont("courier", "normal");
+              item.content.forEach(codeLine => {
+                if (yPos > 720) {
+                  doc.addPage();
+                  setPageBackground(doc);
+                  yPos = 40;
+                }
+                const wrapped = doc.splitTextToSize(codeLine, 520);
+                wrapped.forEach(wLine => {
+                  doc.text(wLine, leftMargin + 20, yPos);
+                  yPos += lineHeight;
+                });
+              });
+            }
+          });
+        }
         yPos += lineHeight;
       });
 
       doc.save(`${thread.name}.pdf`);
       showNotification("PDF file downloaded");
+    }
+
+    /***********************
+     * Process Bot Messages
+     ***********************/
+    function processBotMessage(content, reasoningMethod) {
+      // If not in CoD mode or content doesn't have the separator, return as is
+      if (reasoningMethod !== "cod" || !content.includes("####")) {
+        // For CoT, keep the message as is
+        if (reasoningMethod === "cot") {
+          return {
+            content: content,
+            thinking: content,
+            answer: null  // No separate answer for CoT
+          };
+        }
+        return {
+          content: content,
+          thinking: null,
+          answer: null
+        };
+      }
+      
+      // For CoD mode, split by the separator
+      const parts = content.split("####");
+      if (parts.length >= 2) {
+        const thinking = parts[0].trim();
+        const answer = parts.slice(1).join("####").trim();  // In case there are multiple #### separators
+        
+        // Return both the full content (for backward compatibility)
+        // and the separated thinking/answer parts
+        return {
+          content: content,
+          thinking: thinking,
+          answer: answer
+        };
+      }
+      
+      // Fallback for malformed responses
+      return {
+        content: content,
+        thinking: null,
+        answer: null
+      };
     }
 
     /***********************
@@ -1150,9 +1287,61 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           timestampEl.style.marginBottom = "0.5rem";
           messageDiv.appendChild(timestampEl);
 
-          const contentEl = document.createElement("div");
-          contentEl.innerHTML = transformMessage(msg.content);
-          messageDiv.appendChild(contentEl);
+          // Special handling for messages with thinking/answer components
+          if (msg.sender === "bot" && !msg.isPlaceholder && (msg.thinking || msg.answer)) {
+            // If we have thinking steps, render them
+            if (msg.thinking) {
+              const thinkingDiv = document.createElement("div");
+              thinkingDiv.className = "thinking-steps";
+              
+              const thinkingLabel = document.createElement("div");
+              thinkingLabel.className = "thinking-label";
+              thinkingLabel.textContent = "Thinking Steps";
+              thinkingDiv.appendChild(thinkingLabel);
+              
+              // Split thinking steps and format them
+              const steps = msg.thinking.split(/\.\s+|\n+/).filter(step => step.trim().length > 0);
+              
+              if (steps.length > 1) {
+                // If multiple steps, format them as a numbered list
+                steps.forEach((step, index) => {
+                  const stepDiv = document.createElement("div");
+                  stepDiv.className = "step";
+                  stepDiv.textContent = `${index + 1}. ${step.trim()}${step.trim().endsWith('.') ? '' : '.'}`;
+                  thinkingDiv.appendChild(stepDiv);
+                });
+              } else {
+                // If just one step or couldn't split properly, use the whole thinking text
+                const fullThinking = document.createElement("div");
+                fullThinking.innerHTML = transformMessage(msg.thinking);
+                thinkingDiv.appendChild(fullThinking);
+              }
+              
+              messageDiv.appendChild(thinkingDiv);
+            }
+            
+            // If we have an answer, render it
+            if (msg.answer) {
+              const answerDiv = document.createElement("div");
+              answerDiv.className = "final-answer";
+              
+              const answerLabel = document.createElement("div");
+              answerLabel.className = "final-answer-label";
+              answerLabel.textContent = "Final Answer";
+              answerDiv.appendChild(answerLabel);
+              
+              const answerContent = document.createElement("div");
+              answerContent.innerHTML = transformMessage(msg.answer);
+              answerDiv.appendChild(answerContent);
+              
+              messageDiv.appendChild(answerDiv);
+            }
+          } else {
+            // Standard rendering for other messages
+            const contentEl = document.createElement("div");
+            contentEl.innerHTML = transformMessage(msg.content);
+            messageDiv.appendChild(contentEl);
+          }
           
           // Add word count badge for bot messages (except placeholders)
           if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
@@ -1172,6 +1361,16 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (thread) {
+        // Process bot messages to separate thinking from answer
+        let thinking = null;
+        let answer = null;
+        
+        if (sender === "bot" && !isPlaceholder) {
+          const processed = processBotMessage(content, REASONING_METHOD);
+          thinking = processed.thinking;
+          answer = processed.answer;
+        }
+        
         thread.messages.push({
           content,
           sender,
@@ -1180,7 +1379,9 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           wordCount: sender === "bot" && !isPlaceholder ? countWords(content) : undefined,
           reasoningMethod: sender === "bot" && !isPlaceholder ? 
             (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
-            undefined
+            undefined,
+          thinking,
+          answer
         });
         renderCurrentThreadMessages();
       }
@@ -1297,13 +1498,18 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             reasoningInfo += `-${COD_WORD_LIMIT}`;
           }
           
+          // Process bot message to separate thinking and answer parts
+          const processed = processBotMessage(trimmedReply, REASONING_METHOD);
+          
           thread.messages[placeholderIndex] = {
             content: trimmedReply,
             sender: "bot",
             isPlaceholder: false,
             timestamp: new Date(),
             wordCount: wordCount,
-            reasoningMethod: reasoningInfo
+            reasoningMethod: reasoningInfo,
+            thinking: processed.thinking,
+            answer: processed.answer
           };
         } else {
           thread.messages[placeholderIndex] = {
@@ -1312,7 +1518,9 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             isPlaceholder: false,
             timestamp: new Date(),
             wordCount: 0,
-            reasoningMethod: REASONING_METHOD.toUpperCase()
+            reasoningMethod: REASONING_METHOD.toUpperCase(),
+            thinking: null,
+            answer: null
           };
         }
       } catch (error) {
@@ -1332,7 +1540,9 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           isPlaceholder: false,
           timestamp: new Date(),
           wordCount: 0,
-          reasoningMethod: REASONING_METHOD.toUpperCase()
+          reasoningMethod: REASONING_METHOD.toUpperCase(),
+          thinking: null,
+          answer: null
         };
       }
       renderCurrentThreadMessages();
