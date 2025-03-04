@@ -53,6 +53,19 @@ exports.handler = async function(event, context) {
       const requestBody = JSON.parse(event.body);
       console.log(`Model requested: ${requestBody.model || 'not specified'}`);
       
+      // Add timing metrics for monitoring CoD vs CoT performance
+      const reasoningMethod = requestBody.messages && 
+                             requestBody.messages[0] && 
+                             requestBody.messages[0].content &&
+                             requestBody.messages[0].content.includes('Chain of Draft') ? 'CoD' : 
+                             (requestBody.messages && 
+                             requestBody.messages[0] && 
+                             requestBody.messages[0].content &&
+                             requestBody.messages[0].content.includes('Chain of Thought') ? 'CoT' : 'Standard');
+      
+      console.log(`Using reasoning method: ${reasoningMethod}`);
+      const startTime = Date.now();
+      
       // Forward the request to Fireworks.ai
       const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
         method: 'POST',
@@ -63,10 +76,20 @@ exports.handler = async function(event, context) {
         body: JSON.stringify(requestBody)
       });
 
-      console.log(`Fireworks API response status: ${response.status}`);
+      const endTime = Date.now();
+      const responseTime = endTime - startTime;
+      console.log(`Fireworks API response status: ${response.status}, time: ${responseTime}ms, method: ${reasoningMethod}`);
       
       // Get the response data
       const data = await response.json();
+      
+      // Add performance metrics to response
+      if (data && !data.error) {
+        data.performance = {
+          response_time_ms: responseTime,
+          reasoning_method: reasoningMethod
+        };
+      }
       
       // Return the response from Fireworks.ai
       return {
