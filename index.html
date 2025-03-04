@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>LLM Playground (COT vs COD)</title>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* --------------------------------
        Global Styles
@@ -211,7 +211,7 @@
       border-radius: 8px;
       padding: 15px;
       margin-bottom: 15px;
-      font-family: 'Courier New', monospace;
+      font-family: 'Roboto Mono', monospace;
       font-size: 0.85rem;
       color: #aaa;
       white-space: pre-wrap;
@@ -252,18 +252,18 @@
       margin-bottom: 8px;
     }
     .word-count-badge {
-position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(30, 30, 30, 0.9);
-  color: #ddd;
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 12px;
-  border: 1px solid #555;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  white-space: nowrap;
-  z-index: 5;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(30, 30, 30, 0.9);
+      color: #ddd;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid #555;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      z-index: 5;
     }
     /* --------------------------------
        Code Block Styles
@@ -574,13 +574,6 @@ position: absolute;
       cursor: help;
     }
 
-    /* COD Word Limit dropdown */
-    .cod-options {
-      margin-top: 15px;
-      margin-left: 24px;
-      display: none;
-    }
-    
     /* Status notification */
     .status-notification {
       position: fixed;
@@ -680,6 +673,131 @@ position: absolute;
     }
     
     .prompt-reset:hover {
+      color: #4a8cff;
+    }
+
+    /* Enhanced styles for Chain of Draft */
+    .cod-thinking {
+      background-color: #1e293b !important;
+      border-color: #3d4e63 !important;
+    }
+
+    .cod-step {
+      display: flex;
+      align-items: flex-start;
+      padding: 6px 8px;
+      margin-bottom: 10px !important;
+      border-left: none !important;
+      background-color: #2c3b4f;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      background-color: #3d4f69;
+      border-radius: 12px;
+      margin-right: 10px;
+      color: #a3c5e9;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .step-content {
+      flex: 1;
+      padding-right: 8px;
+      font-family: 'Roboto Mono', monospace;
+      color: #c5d5e8;
+    }
+
+    /* Enhanced token display */
+    .token-savings {
+      font-size: 0.7rem;
+      color: #4ade80;
+      margin-left: 5px;
+    }
+
+    /* COD Word Limit options */
+    .cod-options {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .cod-word-limit-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .cod-word-limit-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background-color: #2a2a2a;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .cod-word-limit-option:hover {
+      background-color: #333;
+    }
+
+    .cod-word-limit-option.selected {
+      background-color: #3a4a5c;
+      border-left: 3px solid #4a8cff;
+    }
+
+    .cod-word-limit-value {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .cod-word-limit-desc {
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    /* CoD examples section */
+    .cod-examples {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      border: 1px solid #444;
+    }
+
+    .cod-examples-header {
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #ddd;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .cod-example-item {
+      margin-bottom: 12px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.85rem;
+      padding: 8px;
+      background-color: #333;
+      border-radius: 5px;
+      color: #bbb;
+    }
+
+    .cod-example-question {
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .cod-example-answer {
       color: #4a8cff;
     }
 
@@ -789,22 +907,14 @@ position: absolute;
               <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked>
               <label for="codReasoning">Chain of Draft (CoD)</label>
               <div class="tooltip">?
-                <span class="tooltiptext">Uses minimal words per step to reduce token usage while maintaining reasoning quality.</span>
+                <span class="tooltiptext">Uses minimal words per step (research paper approach) to reduce token usage while maintaining reasoning quality.</span>
               </div>
             </div>
           </div>
           
           <!-- COD Word Limit options -->
           <div id="codOptions" class="cod-options">
-            <label for="codWordLimit">Word limit per step:</label>
-            <select id="codWordLimit">
-              <option value="5">5 words (Default)</option>
-              <option value="10">10 words</option>
-              <option value="15">15 words</option>
-              <option value="17">17 words</option>
-              <option value="21">21 words</option>
-              <option value="30">30 words</option>
-            </select>
+            <!-- This will be populated by the updateCoDOptionsUI function -->
           </div>
         </div>
       </div>
@@ -959,14 +1069,25 @@ position: absolute;
       standard: "",
       cot: `Think step by step to solve this problem. Explain your reasoning at each step, then provide your final answer.`,
       
-      cod: `Think step by step, but only keep a minimum draft for each thinking step, with 5 words at most. Write your steps as simple phrases separated by periods, without using any markdown symbols like '###'. Return your final answer after the separator ####.
+      cod: `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
+  
+Separate your steps with periods. Write your final answer after the #### separator.
 
 Examples:
 Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?
-A: Initial: 20 lollipops. Remaining: 12 lollipops. Difference: 20 - 12. Calculate: 8 lollipops. #### 8 lollipops
+A: 20 initial. 12 remaining. 20 - 12 = 8. #### 8 lollipops
 
-Q: If a fabric store received 45 yards of cotton material, and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
-A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`
+Q: Roger has $125. He spends $55 on a video game and then receives $25 for his birthday. How much money does Roger have now?
+A: Start: $125. Spent: $55. 125 - 55 = $70. Received: $25. 70 + 25 = $95. #### $95
+
+Q: A square has a perimeter of 20 cm. What is its area?
+A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 square centimeters
+
+Q: If a fabric store received 45 yards of cotton material and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
+A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #### 35 yards
+
+Q: The temperature on Monday was -3°C. On Tuesday, it was 14°C. What was the change in temperature from Monday to Tuesday?
+A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
     };
     
     // Default generation parameters
@@ -1100,13 +1221,24 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Word Counting Utility
+     * Word Counting Utility - IMPROVED FOR COD
      ***********************/
     function countWords(text) {
       // Remove code blocks to get more accurate word count for actual text
       const textWithoutCode = text.replace(/```[\s\S]*?```/g, '');
+      
+      // Count mathematical expressions as single words
+      // First, replace common math expressions with placeholder words
+      let processedText = textWithoutCode
+        // Replace simple equations (e.g., "x = 5 + 3") with single tokens
+        .replace(/\b\w+\s*=\s*[\d\w+\-*/()]+/g, "EQUATION")
+        // Replace fractions (e.g., "2/3") with single tokens
+        .replace(/\b\d+\/\d+\b/g, "FRACTION")
+        // Replace mathematical operations with spaces
+        .replace(/[+\-*/=<>]+/g, " ");
+      
       // Split by whitespace and filter out empty strings
-      const words = textWithoutCode.split(/\s+/).filter(word => word.length > 0);
+      const words = processedText.split(/\s+/).filter(word => word.length > 0);
       return words.length;
     }
 
@@ -1318,12 +1450,13 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Process Bot Messages - IMPROVED VERSION
+     * Process Bot Messages - IMPROVED VERSION FOR COD
      ***********************/
     function processBotMessage(content, reasoningMethod) {
-      // For Chain of Draft (CoD) mode, look for the #### separator
+      // For Chain of Draft (CoD) mode, extract thinking steps and final answer
       if (reasoningMethod === "cod") {
         const separatorIndex = content.indexOf("####");
+        
         if (separatorIndex !== -1) {
           // Extract thinking steps and final answer
           let thinking = content.substring(0, separatorIndex).trim();
@@ -1334,6 +1467,27 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
             thinking: thinking,
             answer: answer
           };
+        } else {
+          // Try to identify thinking steps and final answer based on structure
+          // Look for phrases that might indicate a conclusion
+          const conclusionPhrases = [
+            "Therefore", "Thus", "Hence", "So", "Result", "Answer", "Finally", 
+            "In conclusion", "The answer is", "This gives us"
+          ];
+          
+          // Split by periods to identify steps
+          const parts = content.split('.');
+          if (parts.length > 1) {
+            // Use the last part as the answer and everything else as thinking
+            const lastPart = parts.pop().trim();
+            const thinking = parts.join('.').trim();
+            
+            return {
+              content: content,
+              thinking: thinking,
+              answer: lastPart
+            };
+          }
         }
       }
       
@@ -1430,22 +1584,34 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
 
     /***********************
-     * Format Thinking Steps - NEW FUNCTION
+     * Format Thinking Steps - IMPROVED FOR COD
      ***********************/
-    function formatThinkingSteps(thinking) {
+    function formatThinkingSteps(thinking, reasoningMethod) {
       if (!thinking) return '';
       
       // Remove any "###" prefixes
       let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, '');
       
-      // Split by periods followed by a space to separate steps
-      let steps = cleanedThinking.split(/\.\s+/);
-      
-      // Join steps with visual separator
-      return steps.filter(step => step.trim())
-        .map(step => 
-          `<div class="step">${step.trim()}${!step.endsWith('.') ? '.' : ''}</div>`
+      if (reasoningMethod === "cod") {
+        // Split by periods to separate steps for CoD
+        let steps = cleanedThinking.split(/\.\s*/).filter(step => step.trim().length > 0);
+        
+        // Create a more visually distinct format for CoD steps
+        return steps.map((step, index) => 
+          `<div class="step cod-step">
+            <span class="step-number">${index + 1}</span>
+            <span class="step-content">${step.trim()}${!step.endsWith('.') ? '.' : ''}</span>
+          </div>`
         ).join('');
+      } else {
+        // Original formatting for CoT
+        let steps = cleanedThinking.split(/\.\s+/);
+        
+        return steps.filter(step => step.trim())
+          .map(step => 
+            `<div class="step">${step.trim()}${!step.endsWith('.') ? '.' : ''}</div>`
+          ).join('');
+      }
     }
 
     /***********************
@@ -1501,14 +1667,23 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
               const thinkingDiv = document.createElement("div");
               thinkingDiv.className = "thinking-steps";
               
+              // Add different style class for CoD
+              if (msg.reasoningMethod && msg.reasoningMethod.startsWith("COD")) {
+                thinkingDiv.classList.add("cod-thinking");
+              }
+              
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "thinking-label";
-              thinkingLabel.textContent = "Thinking Steps";
+              thinkingLabel.textContent = msg.reasoningMethod && msg.reasoningMethod.startsWith("COD") ? 
+                "Chain of Draft Steps" : "Thinking Steps";
               thinkingDiv.appendChild(thinkingLabel);
               
-              // Format thinking steps using the formatted steps function
+              // Format thinking steps using the improved formatted steps function
               const thinkingContent = document.createElement("div");
-              thinkingContent.innerHTML = formatThinkingSteps(msg.thinking);
+              thinkingContent.innerHTML = formatThinkingSteps(
+                msg.thinking, 
+                msg.reasoningMethod ? msg.reasoningMethod.toLowerCase() : REASONING_METHOD
+              );
               thinkingDiv.appendChild(thinkingContent);
               
               messageContainer.appendChild(thinkingDiv);
@@ -1550,7 +1725,32 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
           if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
             const wordCountBadge = document.createElement("div");
             wordCountBadge.className = "word-count-badge";
-            wordCountBadge.textContent = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+            
+            // Calculate token savings if we have CoD
+            let badgeText = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
+            
+            // If this is a CoD message, add token savings estimate
+            if (msg.reasoningMethod && msg.reasoningMethod.startsWith("COD") && thread.messages.length > 1) {
+              // Find a similar CoT message (if available) to compare token savings
+              const cotMessages = thread.messages.filter(m => 
+                m.sender === "bot" && 
+                m.reasoningMethod && 
+                m.reasoningMethod === "COT" && 
+                !m.isPlaceholder
+              );
+              
+              if (cotMessages.length > 0) {
+                // Calculate average token savings compared to CoT
+                const avgCotWords = cotMessages.reduce((sum, m) => sum + m.wordCount, 0) / cotMessages.length;
+                const savings = Math.round(100 - ((msg.wordCount / avgCotWords) * 100));
+                
+                if (savings > 0) {
+                  badgeText += ` (${savings}% fewer words)`;
+                }
+              }
+            }
+            
+            wordCountBadge.textContent = badgeText;
             messageDiv.appendChild(wordCountBadge);
           }
 
@@ -1608,7 +1808,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         
         // If it's COD, update the word limit
         if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
-          systemPrompt = systemPrompt.replace(/with \d+ words at most/, `with ${COD_WORD_LIMIT} words at most`);
+          systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
         }
         
         console.log(`Using ${REASONING_METHOD.toUpperCase()} prompt ${REASONING_METHOD === "cod" ? "with word limit " + COD_WORD_LIMIT : ""}`);
@@ -1911,6 +2111,75 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       });
     }
     
+    // Improved Chain of Draft word limit options UI
+    function updateCoDOptionsUI() {
+      const codOptions = document.getElementById('codOptions');
+      if (!codOptions) return;
+      
+      codOptions.innerHTML = `
+        <div class="option-label">Word limit per step:</div>
+        <div class="cod-word-limit-options">
+          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 5 ? 'selected' : ''}" data-value="5">
+            <span class="cod-word-limit-value">5 words</span>
+            <span class="cod-word-limit-desc">Original paper recommendation</span>
+          </div>
+          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 10 ? 'selected' : ''}" data-value="10">
+            <span class="cod-word-limit-value">10 words</span>
+            <span class="cod-word-limit-desc">Balanced brevity and clarity</span>
+          </div>
+          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 15 ? 'selected' : ''}" data-value="15">
+            <span class="cod-word-limit-value">15 words</span>
+            <span class="cod-word-limit-desc">More descriptive steps</span>
+          </div>
+        </div>
+        
+        <div class="cod-examples">
+          <div class="cod-examples-header">Chain of Draft Example</div>
+          <div class="cod-example-item">
+            <div class="cod-example-question">Q: If a fabric store received 45 yards of cotton and used 2/9 of it, how many yards remain?</div>
+            <div class="cod-example-answer">A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #### 35 yards</div>
+          </div>
+        </div>
+      `;
+      
+      // Add event listeners to the word limit options
+      const wordLimitOptions = document.querySelectorAll('.cod-word-limit-option');
+      wordLimitOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          // Update selected state
+          wordLimitOptions.forEach(opt => opt.classList.remove('selected'));
+          option.classList.add('selected');
+          
+          // Update word limit value
+          COD_WORD_LIMIT = parseInt(option.getAttribute('data-value'));
+          
+          // Update the prompt
+          updateCoDPrompt();
+          
+          // Update display
+          updateCurrentModelDisplay();
+        });
+      });
+    }
+    
+    // Improved function to update the CoD prompt when word limit changes
+    function updateCoDPrompt() {
+      // Update the prompt to reflect new word limit
+      const basePrompt = `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
+  
+Separate your steps with periods. Write your final answer after the #### separator.`;
+      
+      // Keep the examples part of the prompt
+      const examplesStart = PROMPTS.cod.indexOf('Examples:');
+      if (examplesStart !== -1) {
+        PROMPTS.cod = basePrompt + '\n\n' + PROMPTS.cod.substring(examplesStart);
+      } else {
+        PROMPTS.cod = basePrompt;
+      }
+      
+      console.log(`Updated CoD prompt with word limit: ${COD_WORD_LIMIT}`);
+    }
+    
     // Setup COD options display
     function setupCODOptions() {
       const reasoningRadios = document.getElementsByName('reasoningMethod');
@@ -1919,6 +2188,7 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
       // Initial state
       if (REASONING_METHOD === 'cod') {
         codOptions.style.display = 'block';
+        updateCoDOptionsUI();
       } else {
         codOptions.style.display = 'none';
       }
@@ -1928,16 +2198,11 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         radio.addEventListener('change', () => {
           if (radio.value === 'cod' && radio.checked) {
             codOptions.style.display = 'block';
+            updateCoDOptionsUI();
           } else {
             codOptions.style.display = 'none';
           }
         });
-      });
-      
-      // Setup word limit dropdown
-      const wordLimitSelect = document.getElementById('codWordLimit');
-      wordLimitSelect.addEventListener('change', () => {
-        COD_WORD_LIMIT = parseInt(wordLimitSelect.value);
       });
     }
     
@@ -1965,10 +2230,6 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         // Set reasoning method radio buttons
         const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
         if (reasoningRadio) reasoningRadio.checked = true;
-        
-        // Set COD word limit
-        const codWordLimit = document.getElementById("codWordLimit");
-        if (codWordLimit) codWordLimit.value = COD_WORD_LIMIT.toString();
         
         // Set parameter sliders
         setSliderAndValue("temp", TEMPERATURE);
@@ -2026,9 +2287,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         
         // Save COD word limit if applicable
         if (REASONING_METHOD === "cod") {
-          const codWordLimitEl = document.getElementById("codWordLimit");
-          if (codWordLimitEl) {
-            COD_WORD_LIMIT = parseInt(codWordLimitEl.value);
+          // Get the selected CoD word limit option
+          const selectedOption = document.querySelector('.cod-word-limit-option.selected');
+          if (selectedOption) {
+            COD_WORD_LIMIT = parseInt(selectedOption.getAttribute('data-value'));
           }
         }
         
@@ -2209,6 +2471,10 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
         loadPersistedSettings();
         console.log("Settings loaded");
         
+        // Update CoD prompt with the correct word limit
+        updateCoDPrompt();
+        console.log("CoD prompt updated");
+        
         createNewThread();
         console.log("New thread created");
         
@@ -2274,16 +2540,16 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
   </script>
   <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
-  <input type="hidden" name="form-name" value="feedback">
-  <input type="hidden" name="model">
-  <input type="hidden" name="reasoning_method">
-  <select name="feedback_type"></select>
-  <input type="radio" name="rating" value="1">
-  <input type="radio" name="rating" value="2">
-  <input type="radio" name="rating" value="3">
-  <input type="radio" name="rating" value="4">
-  <input type="radio" name="rating" value="5">
-  <textarea name="comments"></textarea>
-</form>
+    <input type="hidden" name="form-name" value="feedback">
+    <input type="hidden" name="model">
+    <input type="hidden" name="reasoning_method">
+    <select name="feedback_type"></select>
+    <input type="radio" name="rating" value="1">
+    <input type="radio" name="rating" value="2">
+    <input type="radio" name="rating" value="3">
+    <input type="radio" name="rating" value="4">
+    <input type="radio" name="rating" value="5">
+    <textarea name="comments"></textarea>
+  </form>
 </body>
 </html>
