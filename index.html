@@ -2031,4 +2031,151 @@ A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35
     }
   </script>
 </body>
+  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
+  <button id="openFeedbackBtn" style="background-color: #4a8cff; color: white; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+    <span style="margin-right: 5px;">💬</span> Feedback
+  </button>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 500px;">
+    <button class="close-modal" id="closeFeedbackModal">&times;</button>
+    <h2>Share Your Feedback</h2>
+    
+    <!-- This is the Netlify Form -->
+    <form name="feedback" method="POST" data-netlify="true">
+      <input type="hidden" name="form-name" value="feedback">
+      
+      <!-- Current Model Info (hidden fields) -->
+      <input type="hidden" id="feedbackModel" name="model">
+      <input type="hidden" id="feedbackReasoning" name="reasoning_method">
+      
+      <!-- Feedback Type -->
+      <label for="feedbackType">Feedback Type:</label>
+      <select id="feedbackType" name="feedback_type" style="width: 100%; margin-bottom: 15px;">
+        <option value="general">General Feedback</option>
+        <option value="bug">Report a Bug</option>
+        <option value="feature">Feature Request</option>
+        <option value="model_performance">Model Performance</option>
+      </select>
+      
+      <!-- Rating -->
+      <label>How would you rate your experience?</label>
+      <div style="display: flex; justify-content: space-between; margin: 10px 0 15px 0;">
+        <label style="flex: 1; text-align: center;">
+          <input type="radio" name="rating" value="1" required>
+          <div>😞</div>
+          <div style="font-size: 0.8rem;">Poor</div>
+        </label>
+        <label style="flex: 1; text-align: center;">
+          <input type="radio" name="rating" value="2">
+          <div>😐</div>
+          <div style="font-size: 0.8rem;">Fair</div>
+        </label>
+        <label style="flex: 1; text-align: center;">
+          <input type="radio" name="rating" value="3">
+          <div>🙂</div>
+          <div style="font-size: 0.8rem;">Good</div>
+        </label>
+        <label style="flex: 1; text-align: center;">
+          <input type="radio" name="rating" value="4">
+          <div>😀</div>
+          <div style="font-size: 0.8rem;">Great</div>
+        </label>
+        <label style="flex: 1; text-align: center;">
+          <input type="radio" name="rating" value="5">
+          <div>🤩</div>
+          <div style="font-size: 0.8rem;">Excellent</div>
+        </label>
+      </div>
+      
+      <!-- Comments -->
+      <label for="feedbackComments">Comments:</label>
+      <textarea 
+        id="feedbackComments" 
+        name="comments" 
+        rows="4" 
+        style="width: 100%; background-color: #2e2e2e; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 10px; margin-bottom: 20px;"
+        required
+      ></textarea>
+      
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        style="background-color: #4a8cff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right;"
+      >
+        Submit Feedback
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Add this JavaScript right before the closing </body> tag, after the HTML above -->
+<script>
+  // Initialize feedback form functionality
+  function initFeedbackForm() {
+    // Get references to elements
+    const openBtn = document.getElementById('openFeedbackBtn');
+    const modal = document.getElementById('feedbackModal');
+    const closeBtn = document.getElementById('closeFeedbackModal');
+    const modelInput = document.getElementById('feedbackModel');
+    const reasoningInput = document.getElementById('feedbackReasoning');
+    
+    // Set up event listeners
+    if (openBtn) {
+      openBtn.addEventListener('click', () => {
+        // Update hidden fields with current model info
+        if (modelInput) modelInput.value = MODEL_NAME_DISPLAY || 'Not set';
+        if (reasoningInput) {
+          let reasoningMethod = REASONING_METHOD.toUpperCase();
+          if (REASONING_METHOD === 'cod') {
+            reasoningMethod += `-${COD_WORD_LIMIT}`;
+          }
+          reasoningInput.value = reasoningMethod;
+        }
+        
+        // Show the modal
+        if (modal) modal.style.display = 'block';
+      });
+    }
+    
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        if (modal) modal.style.display = 'none';
+      });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Show success message after form submission
+    const form = document.querySelector('form[name="feedback"]');
+    if (form) {
+      form.addEventListener('submit', () => {
+        setTimeout(() => {
+          showNotification('Thank you for your feedback!');
+          if (modal) modal.style.display = 'none';
+        }, 500);
+      });
+    }
+  }
+  
+  // Call this in your existing init function
+  document.addEventListener('DOMContentLoaded', () => {
+    // Your existing initialization code runs first
+    
+    // Then initialize the feedback form
+    setTimeout(initFeedbackForm, 1000);
+  });
+  
+  // Or if you need to ensure it runs after your main init
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(initFeedbackForm, 2000);
+  }
+</script>
 </html>
