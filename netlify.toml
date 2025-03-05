@@ -8,12 +8,15 @@
   # Directory with the serverless functions
   functions = "netlify/functions"
 
-# Set function timeout to 120 seconds (2 minutes), which is Netlify's maximum
+# Function settings
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["node-fetch"]
   included_files = []
-  timeout = "120"
+
+# Set function timeout (must be in build.environment)  
+[build.environment]
+  AWS_LAMBDA_FUNCTION_TIMEOUT = "120"
 
 # Set up chunked uploads for large request bodies
 [build.processing]
