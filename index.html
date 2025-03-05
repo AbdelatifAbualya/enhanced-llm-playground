@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>LLM Playground (COT vs COD)</title>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* --------------------------------
        Global Styles
@@ -211,7 +211,7 @@
       border-radius: 8px;
       padding: 15px;
       margin-bottom: 15px;
-      font-family: 'Roboto Mono', monospace;
+      font-family: 'Courier New', monospace;
       font-size: 0.85rem;
       color: #aaa;
       white-space: pre-wrap;
@@ -252,18 +252,18 @@
       margin-bottom: 8px;
     }
     .word-count-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: rgba(30, 30, 30, 0.9);
-      color: #ddd;
-      font-size: 0.7rem;
-      padding: 3px 8px;
-      border-radius: 12px;
-      border: 1px solid #555;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-      white-space: nowrap;
-      z-index: 5;
+position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(30, 30, 30, 0.9);
+  color: #ddd;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  z-index: 5;
     }
     /* --------------------------------
        Code Block Styles
@@ -574,6 +574,13 @@
       cursor: help;
     }
 
+    /* COD Word Limit dropdown */
+    .cod-options {
+      margin-top: 15px;
+      margin-left: 24px;
+      display: none;
+    }
+    
     /* Status notification */
     .status-notification {
       position: fixed;
@@ -674,322 +681,6 @@
     
     .prompt-reset:hover {
       color: #4a8cff;
-    }
-
-    /* Enhanced styles for Chain of Draft */
-    .cod-thinking {
-      background-color: #1e293b !important;
-      border-color: #3d4e63 !important;
-    }
-
-    .cod-step {
-      display: flex;
-      align-items: flex-start;
-      padding: 6px 8px;
-      margin-bottom: 10px !important;
-      border-left: none !important;
-      background-color: #2c3b4f;
-      border-radius: 6px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-
-    .step-number {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 24px;
-      height: 24px;
-      background-color: #3d4f69;
-      border-radius: 12px;
-      margin-right: 10px;
-      color: #a3c5e9;
-      font-size: 0.75rem;
-      font-weight: bold;
-    }
-
-    .step-content {
-      flex: 1;
-      padding-right: 8px;
-      font-family: 'Roboto Mono', monospace;
-      color: #c5d5e8;
-    }
-
-    /* Enhanced token display */
-    .token-savings {
-      font-size: 0.7rem;
-      color: #4ade80;
-      margin-left: 5px;
-    }
-
-    /* COD Word Limit options */
-    .cod-options {
-      margin-top: 15px;
-      display: none;
-    }
-
-    .cod-word-limit-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-
-    .cod-word-limit-option {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      margin-bottom: 8px;
-      background-color: #2a2a2a;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .cod-word-limit-option:hover {
-      background-color: #333;
-    }
-
-    .cod-word-limit-option.selected {
-      background-color: #3a4a5c;
-      border-left: 3px solid #4a8cff;
-    }
-
-    .cod-word-limit-value {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
-    .cod-word-limit-desc {
-      font-size: 0.85rem;
-      color: #aaa;
-    }
-
-    /* CoD examples section */
-    .cod-examples {
-      margin-top: 15px;
-      padding: 15px;
-      background-color: #2a2a2a;
-      border-radius: 8px;
-      border: 1px solid #444;
-    }
-
-    .cod-examples-header {
-      font-size: 0.9rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #ddd;
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
-    }
-
-    .cod-example-item {
-      margin-bottom: 12px;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.85rem;
-      padding: 8px;
-      background-color: #333;
-      border-radius: 5px;
-      color: #bbb;
-    }
-
-    .cod-example-question {
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-
-    .cod-example-answer {
-      color: #4a8cff;
-    }
-    
-    /* Word count breakdown */
-    .word-count-breakdown {
-      font-size: 0.7rem;
-      color: #aaa;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-
-    .count-item {
-      display: flex;
-      align-items: center;
-    }
-
-    .count-thinking {
-      color: #b7c9db;
-    }
-
-    .count-answer {
-      color: #90cdf4;
-    }
-    
-    /* NEW STYLING: Enhanced reasoning features */
-    .advanced-options-header {
-      font-size: 0.95rem;
-      font-weight: 500;
-      margin: 15px 0 8px 0;
-      color: #ddd;
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 22px;
-    }
-    
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #555;
-      transition: .4s;
-      border-radius: 22px;
-    }
-    
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .toggle-slider {
-      background-color: #4a8cff;
-    }
-    
-    input:checked + .toggle-slider:before {
-      transform: translateX(22px);
-    }
-    
-    .enhanced-reasoning {
-      background-color: #2a3746;
-      border: 1px solid #3d4e63;
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 10px;
-    }
-    
-    .enhanced-reasoning-option {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    
-    .enhanced-reasoning-option input[type="radio"] {
-      margin-right: 10px;
-    }
-    
-    .option-description {
-      margin-left: 25px;
-      font-size: 0.8rem;
-      color: #aaa;
-      margin-bottom: 10px;
-    }
-    
-    .complexity-indicator {
-      display: flex;
-      margin-top: 15px;
-      margin-bottom: 10px;
-    }
-    
-    .complexity-level {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-    
-    .complexity-bar {
-      height: 5px;
-      background-color: #3d4e63;
-      margin-top: 5px;
-      border-radius: 2px;
-      width: 100%;
-    }
-    
-    .complexity-label {
-      font-size: 0.75rem;
-      color: #90cdf4;
-    }
-    
-    .preset-type {
-      display: inline-block;
-      padding: 3px 8px;
-      background-color: #2c3a4f;
-      color: #90cdf4;
-      border-radius: 12px;
-      font-size: 0.7rem;
-      margin-left: 8px;
-    }
-    
-    /* Auto-detection indicator */
-    .auto-detection-badge {
-      display: inline-flex;
-      align-items: center;
-      background-color: #394e6a;
-      color: #a3c5e9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      margin-left: 7px;
-    }
-    
-    .auto-detection-badge .indicator {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background-color: #68d391;
-      border-radius: 50%;
-      margin-right: 4px;
-    }
-    
-    /* Help panel for complex problems */
-    .problem-analyzer {
-      margin-top: 15px;
-      background-color: #2a3746;
-      border: 1px solid #3d4e63;
-      border-radius: 8px;
-      padding: 12px;
-    }
-    
-    .analyzer-title {
-      font-weight: 500;
-      color: #90cdf4;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .analyzer-icon {
-      margin-right: 6px;
-      color: #68d391;
-    }
-    
-    .analyzer-help {
-      font-size: 0.85rem;
-      color: #bbb;
-      margin-bottom: 10px;
-      line-height: 1.4;
     }
 
     /* Responsive adjustments */
@@ -1098,58 +789,22 @@
               <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked>
               <label for="codReasoning">Chain of Draft (CoD)</label>
               <div class="tooltip">?
-                <span class="tooltiptext">Uses minimal words per step (research paper approach) to reduce token usage while maintaining reasoning quality.</span>
+                <span class="tooltiptext">Uses minimal words per step to reduce token usage while maintaining reasoning quality.</span>
               </div>
             </div>
           </div>
           
           <!-- COD Word Limit options -->
           <div id="codOptions" class="cod-options">
-            <!-- This will be populated by the updateCoDOptionsUI function -->
-          </div>
-        </div>
-        
-        <!-- NEW: Enhanced Reasoning Controls -->
-        <div class="advanced-options-header">
-          Advanced Reasoning Options
-          <label class="toggle-switch">
-            <input type="checkbox" id="enhancedReasoningToggle" checked>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        
-        <div id="enhancedReasoningOptions" class="enhanced-reasoning">
-          <div class="enhanced-reasoning-option">
-            <input type="radio" id="adaptiveReasoning" name="reasoningEnhancement" value="adaptive" checked>
-            <label for="adaptiveReasoning">Adaptive Reasoning</label>
-            <span class="auto-detection-badge"><span class="indicator"></span>Auto</span>
-          </div>
-          <div class="option-description">
-            Automatically increases reasoning depth for complex problems (math, logic, multi-step reasoning).
-          </div>
-          
-          <div class="enhanced-reasoning-option">
-            <input type="radio" id="standardReasoning" name="reasoningEnhancement" value="standard">
-            <label for="standardReasoning">Fixed Reasoning Depth</label>
-          </div>
-          <div class="option-description">
-            Uses the same reasoning approach for all problems regardless of complexity.
-          </div>
-          
-          <div class="problem-analyzer">
-            <div class="analyzer-title">
-              <span class="analyzer-icon">🔍</span> Problem Complexity Detection
-            </div>
-            <div class="analyzer-help">
-              When adaptive reasoning is enabled, the system will automatically analyze your questions to detect:
-              <ul style="margin-top: 5px; padding-left: 20px; font-size: 0.85rem;">
-                <li>Mathematical expressions and calculations</li>
-                <li>Multi-step reasoning requirements</li>
-                <li>Logical dependencies and constraints</li>
-                <li>Complex or abstract concepts</li>
-              </ul>
-              For complex problems, the model will use more detailed reasoning steps even with CoD.
-            </div>
+            <label for="codWordLimit">Word limit per step:</label>
+            <select id="codWordLimit">
+              <option value="5">5 words (Default)</option>
+              <option value="10">10 words</option>
+              <option value="15">15 words</option>
+              <option value="17">17 words</option>
+              <option value="21">21 words</option>
+              <option value="30">30 words</option>
+            </select>
           </div>
         </div>
       </div>
@@ -1299,107 +954,19 @@
     // COD Word Limit
     let COD_WORD_LIMIT = 5;
     
-    // NEW: Enhanced reasoning controls
-    let ENHANCED_REASONING_ENABLED = true;
-    let REASONING_ENHANCEMENT = "adaptive"; // Options: "adaptive", "standard"
-    
-    // NEW: Problem complexity detection
-    let PROBLEM_COMPLEXITY = {
-      hasMath: false,
-      hasLogic: false,
-      multiStep: false,
-      complexity: "normal" // Options: "simple", "normal", "complex"
-    };
-    
     // Prompts for different reasoning methods
     let PROMPTS = {
       standard: "",
-      
       cot: `Think step by step to solve this problem. Explain your reasoning at each step, then provide your final answer.`,
       
-      cod: `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
-  
-Separate your steps with periods. Write your final answer after the #### separator.
+      cod: `Think step by step, but only keep a minimum draft for each thinking step, with 5 words at most. Write your steps as simple phrases separated by periods, without using any markdown symbols like '###'. Return your final answer after the separator ####.
 
 Examples:
 Q: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?
-A: 20 initial. 12 remaining. 20 - 12 = 8. #### 8 lollipops
+A: Initial: 20 lollipops. Remaining: 12 lollipops. Difference: 20 - 12. Calculate: 8 lollipops. #### 8 lollipops
 
-Q: Roger has $125. He spends $55 on a video game and then receives $25 for his birthday. How much money does Roger have now?
-A: Start: $125. Spent: $55. 125 - 55 = $70. Received: $25. 70 + 25 = $95. #### $95
-
-Q: A square has a perimeter of 20 cm. What is its area?
-A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 square centimeters
-
-Q: If a fabric store received 45 yards of cotton material and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
-A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #### 35 yards
-
-Q: The temperature on Monday was -3°C. On Tuesday, it was 14°C. What was the change in temperature from Monday to Tuesday?
-A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
-    };
-    
-    // NEW: Enhanced prompts for complex problems with different word limits
-    let ENHANCED_PROMPTS = {
-      cot: `Think step by step to solve this problem. This appears to be a complex problem that requires careful reasoning. Break down your thinking into clear steps, making sure to consider all relevant information and constraints. 
-
-For complex problems, use as many steps as needed to work through the solution thoroughly. It's better to use more steps with clear reasoning than to skip steps.
-
-Check your calculations and logic at each step. After you've completed your reasoning process, provide your final answer.`,
-      
-      cod5: `Think step by step to solve this complex problem. For each step, use at most 5 words to capture the essential reasoning, but use AS MANY STEPS as needed to thoroughly work through the problem. Use mathematical notation where efficient. Show ALL intermediate calculations and logical inferences.
-
-IMPORTANT: Instead of trying to fit complex reasoning into fewer steps, break your reasoning into more numerous simple steps. For example, instead of one step with "Calculate area using length×width=50×30=1500", use multiple steps:
-1. Length = 50.
-2. Width = 30.
-3. Area = length × width.
-4. Area = 50 × 30.
-5. Area = 1500.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem with sufficient steps:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: speed 60 mph. First segment: time 2h. First segment: distance = 60 × 2. First segment: distance = 120 miles. Second segment: speed 75 mph. Second segment: time 1h. Second segment: distance = 75 × 1. Second segment: distance = 75 miles. Third segment: speed 50 mph. Third segment: time 0.5h. Third segment: distance = 50 × 0.5. Third segment: distance = 25 miles. Total distance: 120 + 75 + 25. Total distance = 220 miles. #### 220 miles`,
-
-      cod10: `Think step by step to solve this complex problem. For each step, use up to 10 words to capture the essential reasoning. Use AS MANY STEPS as needed to fully solve the problem. Include ALL intermediate calculations and logical inferences.
-
-IMPORTANT: For complex problems, it's better to use more steps with clear reasoning than to try cramming too much into each step. Break complex calculations into multiple steps.
-
-When thinking through difficult parts of a problem:
-1. Identify what information you need
-2. Think about how to derive that information
-3. Perform calculations systematically
-4. Check your work at key points
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: speed 60 mph for 2 hours. First segment distance calculation: 60 mph × 2h. First segment distance = 120 miles. Second segment: speed 75 mph for 1 hour. Second segment distance calculation: 75 mph × 1h. Second segment distance = 75 miles. Third segment: speed 50 mph for 0.5 hours. Third segment distance calculation: 50 mph × 0.5h. Third segment distance = 25 miles. Need to sum all segment distances. Total distance calculation: 120 + 75 + 25. Total distance traveled = 220 miles. #### 220 miles`,
-      
-      cod15: `Think step by step to solve this complex problem. For each step, use up to 15 words to capture the essential reasoning, providing more detail for critical steps. Use mathematical notation where helpful but include explanations of your approach at key points.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, so distance = 60 × 2 = 120 miles. Second segment: The car increases to 75 mph for 1 hour, so distance = 75 × 1 = 75 miles. Third segment: The car decreases to 50 mph for 0.5 hours, so distance = 50 × 0.5 = 25 miles. Total distance traveled = 120 + 75 + 25 = 220 miles. #### 220 miles`,
-      
-      cod17: `Think step by step to solve this complex problem. For each step, use up to 17 words to provide clear reasoning, especially for difficult parts. Balance precision and concision, using math notation to save words.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, giving distance = 60 × 2 = 120 miles. Second segment: Speed increases to 75 mph for 1 hour, so this segment's distance = 75 miles. Third segment: Speed is 50 mph for 0.5 hours, contributing 50 × 0.5 = 25 miles. Total journey distance = 120 + 75 + 25 = 220 miles. #### 220 miles`,
-      
-      cod20: `Think step by step to solve this complex problem. For each step, use up to 20 words to provide clear reasoning, explaining your approach more thoroughly for the difficult parts of the problem.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, so the distance covered in this segment is 60 × 2 = 120 miles. Second segment: The car then increases speed to 75 mph and maintains this for 1 hour, covering 75 × 1 = 75 miles. Third segment: Finally, the car decreases speed to 50 mph for 30 minutes (0.5 hours), covering 50 × 0.5 = 25 miles. Total distance traveled over the entire journey = 120 + 75 + 25 = 220 miles. #### 220 miles`
+Q: If a fabric store received 45 yards of cotton material, and used 2/9 of it for a bulk order, how many yards of cotton material does the fabric store have left?
+A: Total: 45 yards. Used: 2/9 of 45. 45 × 2/9 = 10. Remaining: 45 - 10. #### 35 yards`
     };
     
     // Default generation parameters
@@ -1437,11 +1004,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           case "cod":
             reasoningBadge = `<span class="reasoning-badge" style="background-color: #2c6b9c;">CoD-${COD_WORD_LIMIT}</span>`;
             break;
-        }
-        
-        // Add enhanced reasoning badge if enabled
-        if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-          reasoningBadge += '<span class="reasoning-badge" style="background-color: #2d5038; margin-left: 3px;">Adaptive</span>';
         }
         
         element.innerHTML = displayText + reasoningBadge;
@@ -1538,187 +1100,14 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     }
 
     /***********************
-     * Word Counting Utility - IMPROVED FOR COD
+     * Word Counting Utility
      ***********************/
     function countWords(text) {
       // Remove code blocks to get more accurate word count for actual text
       const textWithoutCode = text.replace(/```[\s\S]*?```/g, '');
-      
-      // Count mathematical expressions as single words
-      // First, replace common math expressions with placeholder words
-      let processedText = textWithoutCode
-        // Replace simple equations (e.g., "x = 5 + 3") with single tokens
-        .replace(/\b\w+\s*=\s*[\d\w+\-*/()]+/g, "EQUATION")
-        // Replace fractions (e.g., "2/3") with single tokens
-        .replace(/\b\d+\/\d+\b/g, "FRACTION")
-        // Replace mathematical operations with spaces
-        .replace(/[+\-*/=<>]+/g, " ");
-      
       // Split by whitespace and filter out empty strings
-      const words = processedText.split(/\s+/).filter(word => word.length > 0);
+      const words = textWithoutCode.split(/\s+/).filter(word => word.length > 0);
       return words.length;
-    }
-
-    /***********************
-     * NEW: Problem Complexity Analysis
-     ***********************/
-    function analyzeProblemComplexity(message) {
-      // Reset current complexity
-      PROBLEM_COMPLEXITY = {
-        hasMath: false,
-        hasLogic: false,
-        multiStep: false,
-        complexity: "normal",
-        wordCount: message.split(/\s+/).length, // Count words in the problem
-        estimatedSteps: 0 // Will be calculated below
-      };
-      
-      // Mathematical expressions and calculations
-      const mathPatterns = [
-        /[0-9\s][\+\-\*\/\=\(\)][0-9\s]/,  // Basic operations
-        /\d+\s*\^\s*\d+/,                  // Powers
-        /\d+\s*\/\s*\d+/,                  // Fractions
-        /(?:sin|cos|tan|log|ln|sqrt|exp)/i, // Math functions
-        /\[\s*[^\]]+\s*\]/,                // Matrix notation
-        /\{\s*[^\}]+\s*\}/,                // Set notation
-        /[\+\-]\s*[\d\.]+[eE][\+\-]\d+/,   // Scientific notation
-        /\d+\s*%/,                         // Percentages
-      ];
-      
-      // Logical expressions
-      const logicPatterns = [
-        /(?:if|then|else|therefore|because|implies|since|hence|thus|consequently)/i,
-        /(?:and|or|not|xor|nor|all|some|every|any|none)/i,
-        /(?:true|false|valid|invalid|prove|QED|contradiction|logical|premise|conclusion)/i,
-      ];
-      
-      // Indicators of multi-step problems
-      const multiStepPatterns = [
-        /(?:first|second|third|next|then|after|finally|lastly|step|phase)/i,
-        /(?:find the total|calculate the|determine the|solve for)/i,
-        /(?:per month|per year|initially|eventually|ultimately|before|after)/i,
-        /(?:increases by|decreases by|changes by|grows|reduces)/i,
-      ];
-      
-      // Check for math patterns
-      for (const pattern of mathPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasMath = true;
-          break;
-        }
-      }
-      
-      // Check for logic patterns
-      for (const pattern of logicPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasLogic = true;
-          break;
-        }
-      }
-      
-      // Check for multi-step patterns
-      for (const pattern of multiStepPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.multiStep = true;
-          break;
-        }
-      }
-      
-      // Determine complexity
-      let complexityScore = 0;
-      if (PROBLEM_COMPLEXITY.hasMath) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.hasLogic) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.multiStep) complexityScore += 1;
-      
-      // Apply more specific pattern checks
-      
-      // Advanced math indicators
-      if (/(?:calculus|differential|integral|equation system|probability|statistics|algebra|geometry)/i.test(message)) {
-        complexityScore += 1;
-      }
-      
-      // Long problems are often complex
-      if (message.length > 500) {
-        complexityScore += 1;
-      }
-      
-      // Multiple constraints or variables
-      if (message.match(/(?:constraint|variable|unknown|factor|parameter|condition)/gi)?.length > 2) {
-        complexityScore += 1;
-      }
-      
-      // Update complexity level
-      if (complexityScore >= 3) {
-        PROBLEM_COMPLEXITY.complexity = "complex";
-        // Estimate number of steps needed based on problem length and complexity
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          5, 
-          Math.min(20, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 15))
-        );
-      } else if (complexityScore >= 1) {
-        PROBLEM_COMPLEXITY.complexity = "normal";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          3, 
-          Math.min(10, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 20))
-        );
-      } else {
-        PROBLEM_COMPLEXITY.complexity = "simple";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          2, 
-          Math.min(5, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 25))
-        );
-      }
-      
-      // Adjust the estimated steps based on problem characteristics
-      if (PROBLEM_COMPLEXITY.hasMath && PROBLEM_COMPLEXITY.multiStep) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 2; // Add more steps for multi-step math problems
-      }
-      
-      if (PROBLEM_COMPLEXITY.hasLogic) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 1; // Add more steps for logical reasoning
-      }
-      
-      // If the problem has math expressions, ensure minimum steps
-      if (PROBLEM_COMPLEXITY.hasMath) {
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(PROBLEM_COMPLEXITY.estimatedSteps, 4);
-      }
-      
-      console.log(`Problem analysis: ${JSON.stringify(PROBLEM_COMPLEXITY)}`);
-      
-      return PROBLEM_COMPLEXITY;
-    }
-
-    /***********************
-     * Parse User Message for Word Count Requirements
-     ***********************/
-    function parseWordCountRequest(message) {
-      // Common patterns for word count requests
-      const patterns = [
-        /(\d+)\s*words?/i, // Matches: "50 words", "100 word", etc.
-        /in\s*(\d+)\s*words/i, // Matches: "in 50 words", "in 100 words"
-        /limit\s*(\d+)\s*words/i, // Matches: "limit 50 words", "limit to 100 words"
-        /answer\s*in\s*(\d+)\s*words/i, // Matches: "answer in 50 words"
-        /respond\s*in\s*(\d+)\s*words/i, // Matches: "respond in 50 words"
-        /keep\s*it\s*to\s*(\d+)\s*words/i, // Matches: "keep it to 50 words"
-        /no\s*more\s*than\s*(\d+)\s*words/i, // Matches: "no more than 50 words"
-        /under\s*(\d+)\s*words/i, // Matches: "under 50 words"
-        /maximum\s*of\s*(\d+)\s*words/i, // Matches: "maximum of 50 words"
-        /max\s*(\d+)\s*words/i // Matches: "max 50 words"
-      ];
-
-      // Check each pattern
-      for (const pattern of patterns) {
-        const match = message.match(pattern);
-        if (match && match[1]) {
-          const wordCount = parseInt(match[1]);
-          if (!isNaN(wordCount) && wordCount > 0) {
-            return wordCount;
-          }
-        }
-      }
-
-      // No word count requirement found
-      return null;
     }
 
     /***********************
@@ -1740,11 +1129,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
         // Add word count info for bot messages
         let headerInfo = prefix;
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          let countInfo = `[${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
-          if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
-            countInfo += ` (thinking: ${msg.thinkingWordCount}, answer: ${msg.answerWordCount})`;
-          }
-          headerInfo += ` ${countInfo}`;
+          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
         }
         
         content += `${headerInfo}:\n`;
@@ -1827,11 +1212,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
         // Add word count info for bot messages
         let sender = msg.sender.toUpperCase() + ":";
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          let countInfo = `[${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
-          if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
-            countInfo += ` (thinking: ${msg.thinkingWordCount}, answer: ${msg.answerWordCount})`;
-          }
-          sender += ` ${countInfo}`;
+          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
         }
         
         doc.text(sender, leftMargin, yPos);
@@ -1937,204 +1318,87 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     }
 
     /***********************
-     * Process Bot Messages - IMPROVED VERSION FOR COD
-     ***********************/
-    function processBotMessage(content, reasoningMethod) {
-      // For Chain of Draft (CoD) mode, extract thinking steps and final answer
-      if (reasoningMethod === "cod") {
-        const separatorIndex = content.indexOf("####");
-        
-        if (separatorIndex !== -1) {
-          // Extract thinking steps and final answer
-          let thinking = content.substring(0, separatorIndex).trim();
-          let answer = content.substring(separatorIndex + 4).trim();
-          
-          return {
-            content: content,
-            thinking: thinking,
-            answer: answer,
-            thinkingWordCount: countWords(thinking),
-            answerWordCount: countWords(answer)
-          };
-        } else {
-          // Try to identify thinking steps and final answer based on structure
-          // Look for phrases that might indicate a conclusion
-          const conclusionPhrases = [
-            "Therefore", "Thus", "Hence", "So", "Result", "Answer", "Finally", 
-            "In conclusion", "The answer is", "This gives us"
-          ];
-          
-          // Split by periods to identify steps
-          const parts = content.split('.');
-          if (parts.length > 1) {
-            // Use the last part as the answer and everything else as thinking
-            const lastPart = parts.pop().trim();
-            const thinking = parts.join('.').trim();
-            
-            return {
-              content: content,
-              thinking: thinking,
-              answer: lastPart,
-              thinkingWordCount: countWords(thinking),
-              answerWordCount: countWords(lastPart)
-            };
-          }
-        }
-      }
+ * Process Bot Messages - IMPROVED VERSION
+ ***********************/
+function processBotMessage(content, reasoningMethod) {
+  // For Chain of Draft (CoD) mode, look for the #### separator
+  if (reasoningMethod === "cod") {
+    const separatorIndex = content.indexOf("####");
+    if (separatorIndex !== -1) {
+      // Extract thinking steps and final answer
+      let thinking = content.substring(0, separatorIndex).trim();
+      let answer = content.substring(separatorIndex + 4).trim();
       
-      // For Chain of Thought (CoT) mode, try to identify a logical final answer section
-      if (reasoningMethod === "cot") {
-        // Look for potential conclusion markers
-        const conclusionMarkers = [
-          "Therefore", "In conclusion", "So,", "Thus,", "Hence,", 
-          "The answer is", "To conclude", "Finally,", "In summary",
-          "As a result", "Consequently", "The final answer"
-        ];
-        
-        // Add a marker for just "Answer:" or "Final answer:" on its own line
-        const answerMarkers = [
-          /\n(Answer:|Final answer:)/i,
-          /^(Answer:|Final answer:)/i,
-          /\n(The answer is:|My answer is:|Final answer is:)/i
-        ];
-        
-        // Try each answer marker pattern
-        for (const pattern of answerMarkers) {
-          const answerMatch = content.match(pattern);
-          if (answerMatch && answerMatch.index !== undefined) {
-            // Found a marker
-            const thinking = content.substring(0, answerMatch.index).trim();
-            const answer = content.substring(answerMatch.index + answerMatch[0].length).trim();
-            
-            return {
-              content: content,
-              thinking: thinking,
-              answer: answer,
-              thinkingWordCount: countWords(thinking),
-              answerWordCount: countWords(answer)
-            };
-          }
-        }
-        
-        // If no explicit answer marker, look for conclusion indicator words
-        let lastMarkerIndex = -1;
-        let bestMarker = "";
-        
-        for (const marker of conclusionMarkers) {
-          // Check for the marker near the end of the text (last 40%)
-          const startSearchPos = content.length * 0.6;
-          const markerIndex = content.indexOf(marker, startSearchPos);
-          
-          if (markerIndex > lastMarkerIndex && markerIndex !== -1) {
-            lastMarkerIndex = markerIndex;
-            bestMarker = marker;
-          }
-        }
-        
-        // If we found a conclusion marker in a reasonable position
-        if (lastMarkerIndex > content.length * 0.6) {
-          const thinking = content.substring(0, lastMarkerIndex).trim();
-          const answer = content.substring(lastMarkerIndex).trim();
-          
-          return {
-            content: content,
-            thinking: thinking,
-            answer: answer,
-            thinkingWordCount: countWords(thinking),
-            answerWordCount: countWords(answer)
-          };
-        }
-        
-        // Last resort: if text has multiple paragraphs, try to use the last paragraph as answer
-        const paragraphs = content.split(/\n\s*\n/);
-        if (paragraphs.length > 1) {
-          const lastParagraph = paragraphs[paragraphs.length - 1].trim();
-          // Only use last paragraph as answer if it's relatively short compared to whole text
-          if (lastParagraph.length < content.length * 0.3) {
-            const thinking = content.substring(0, content.lastIndexOf(lastParagraph)).trim();
-            return {
-              content: content,
-              thinking: thinking,
-              answer: lastParagraph,
-              thinkingWordCount: countWords(thinking),
-              answerWordCount: countWords(lastParagraph)
-            };
-          }
-        }
-      }
-      
-      // For standard reasoning
-      if (reasoningMethod === "standard") {
-        return {
-          content: content,
-          thinking: null, 
-          answer: content,
-          thinkingWordCount: 0,
-          answerWordCount: countWords(content)
-        };
-      }
-      
-      // Default: if unable to separate, return entire content
       return {
         content: content,
-        thinking: reasoningMethod === "cot" || reasoningMethod === "cod" ? content : null,
-        answer: reasoningMethod === "standard" ? content : null,
-        thinkingWordCount: reasoningMethod === "cot" || reasoningMethod === "cod" ? countWords(content) : 0,
-        answerWordCount: reasoningMethod === "standard" ? countWords(content) : 0
+        thinking: thinking,
+        answer: answer
       };
     }
-
-    /***********************
-     * Format Thinking Steps - IMPROVED FOR COD
-     ***********************/
-    function formatThinkingSteps(thinking, reasoningMethod) {
-      if (!thinking) return '';
-      
-      // Remove any "###" prefixes
-      let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, '');
-      
-      if (reasoningMethod === "cod") {
-        // Split by periods to separate steps for CoD
-        let steps = cleanedThinking.split(/\.\s*/).filter(step => step.trim().length > 0);
-        
-        // Create a more visually distinct format for CoD steps
-        return steps.map((step, index) => 
-          `<div class="step cod-step">
-            <span class="step-number">${index + 1}</span>
-            <span class="step-content">${step.trim()}${!step.endsWith('.') ? '.' : ''}</span>
-          </div>`
-        ).join('');
-      } else {
-        // Original formatting for CoT
-        let steps = cleanedThinking.split(/\.\s+/);
-        
-        return steps.filter(step => step.trim())
-          .map(step => 
-            `<div class="step">${step.trim()}${!step.endsWith('.') ? '.' : ''}</div>`
-          ).join('');
+  }
+  
+  // For Chain of Thought (CoT) mode, try to identify a logical final answer section
+  if (reasoningMethod === "cot") {
+    // [rest of the existing function...]
+    
+    // Last resort: if text has multiple paragraphs, try to use the last paragraph as answer
+    const paragraphs = content.split(/\n\s*\n/);
+    if (paragraphs.length > 1) {
+      const lastParagraph = paragraphs[paragraphs.length - 1].trim();
+      // Only use last paragraph as answer if it's relatively short compared to whole text
+      if (lastParagraph.length < content.length * 0.3) {
+        const thinking = content.substring(0, content.lastIndexOf(lastParagraph)).trim();
+        return {
+          content: content,
+          thinking: thinking,
+          answer: lastParagraph
+        };
       }
     }
+  }
+  
+  // For standard reasoning
+  if (reasoningMethod === "standard") {
+    return {
+      content: content,
+      thinking: null, 
+      answer: content
+    };
+  }
+  
+  // Default: if unable to separate, return entire content
+  return {
+    content: content,
+    thinking: reasoningMethod === "cot" || reasoningMethod === "cod" ? content : null,
+    answer: reasoningMethod === "standard" ? content : null
+  };
+}
 
-    /***********************
-     * Transform Message
-     ***********************/
-    function transformMessage(content) {
-      // Remove "###" prefixes from lines
-      let processedContent = content.replace(/^#{1,3}\s*/gm, '');
-      
-      // Replace code blocks with syntax highlighting
-      const transformed = processedContent.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-        let language = '';
-        const lines = codeContent.split('\n');
-        if (lines.length > 0 && !lines[0].includes(' ')) {
-          language = lines[0].trim();
-          lines.shift();
-        }
-        return `<pre><code class="${language}">${lines.join('\n')}</code></pre>`;
-      });
-      return transformed;
-    }
+/***********************
+ * Format Thinking Steps - NEW FUNCTION
+ ***********************/
+function formatThinkingSteps(thinking) {
+  if (!thinking) return '';
+  
+  // Remove any "###" prefixes
+  let cleanedThinking = thinking.replace(/^#{1,3}\s*/gm, '');
+  
+  // Split by periods followed by a space to separate steps
+  let steps = cleanedThinking.split(/\.\s+/);
+  
+  // Join steps with visual separator
+  return steps.filter(step => step.trim())
+    .map(step => 
+      `<div class="step">${step.trim()}${!step.endsWith('.') ? '.' : ''}</div>`
+    ).join('');
+}
 
+/***********************
+ * Transform Message
+ ***********************/
+function transformMessage(content) {
+  // Rest of the function...
+}
     /***********************
      * Rendering Messages - IMPROVED VERSION
      ***********************/
@@ -2168,23 +1432,14 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               const thinkingDiv = document.createElement("div");
               thinkingDiv.className = "thinking-steps";
               
-              // Add different style class for CoD
-              if (msg.reasoningMethod && msg.reasoningMethod.startsWith("COD")) {
-                thinkingDiv.classList.add("cod-thinking");
-              }
-              
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "thinking-label";
-              thinkingLabel.textContent = msg.reasoningMethod && msg.reasoningMethod.startsWith("COD") ? 
-                "Chain of Draft Steps" : "Thinking Steps";
+              thinkingLabel.textContent = "Thinking Steps";
               thinkingDiv.appendChild(thinkingLabel);
               
-              // Format thinking steps using the improved formatted steps function
+              // Format thinking steps
               const thinkingContent = document.createElement("div");
-              thinkingContent.innerHTML = formatThinkingSteps(
-                msg.thinking, 
-                msg.reasoningMethod ? msg.reasoningMethod.toLowerCase() : REASONING_METHOD
-              );
+              thinkingContent.innerHTML = transformMessage(msg.thinking);
               thinkingDiv.appendChild(thinkingContent);
               
               messageContainer.appendChild(thinkingDiv);
@@ -2226,46 +1481,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
             const wordCountBadge = document.createElement("div");
             wordCountBadge.className = "word-count-badge";
-            
-            // Calculate token savings if we have CoD
-            let badgeText = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
-            
-            wordCountBadge.innerHTML = badgeText;
-            
-            // Add breakdown of thinking vs answer word counts
-            if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
-              wordCountBadge.innerHTML += `
-                <div class="word-count-breakdown">
-                  <span class="count-item count-thinking">thinking: ${msg.thinkingWordCount}</span>
-                  <span class="count-item count-answer">answer: ${msg.answerWordCount}</span>
-                </div>
-              `;
-            }
-            
-            // If this is a CoD message, add token savings estimate
-            if (msg.reasoningMethod && msg.reasoningMethod.startsWith("COD") && thread.messages.length > 1) {
-              // Find a similar CoT message (if available) to compare token savings
-              const cotMessages = thread.messages.filter(m => 
-                m.sender === "bot" && 
-                m.reasoningMethod && 
-                m.reasoningMethod === "COT" && 
-                !m.isPlaceholder
-              );
-              
-              if (cotMessages.length > 0) {
-                // Calculate average token savings compared to CoT
-                const avgCotWords = cotMessages.reduce((sum, m) => sum + m.wordCount, 0) / cotMessages.length;
-                const savings = Math.round(100 - ((msg.wordCount / avgCotWords) * 100));
-                
-                if (savings > 0) {
-                  const savingsEl = document.createElement("div");
-                  savingsEl.className = "token-savings";
-                  savingsEl.textContent = `${savings}% fewer words than CoT`;
-                  wordCountBadge.appendChild(savingsEl);
-                }
-              }
-            }
-            
+            wordCountBadge.textContent = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
             messageDiv.appendChild(wordCountBadge);
           }
 
@@ -2276,166 +1492,39 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       addCodeCopyButtons();
     }
 
-async function sendMessage(message) {
-  // NEW: Analyze problem complexity if enhanced reasoning is enabled
-  if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-    analyzeProblemComplexity(message);
-  }
-  
-  addMessageToCurrentThread(message, "user");
-
-  if (!MODEL_NAME) {
-    const errorMsg = "Error: Please set the Model Name in the Settings.";
-    addMessageToCurrentThread(errorMsg, "bot");
-    console.error(errorMsg);
-    return;
-  }
-
-  // Parse message for word count requirements
-  const wordCountRequest = parseWordCountRequest(message);
-  
-  addMessageToCurrentThread("Bot is typing...", "bot", true);
-  const thread = threads.find(t => t.id === currentThreadId);
-  const placeholderIndex = thread.messages.length - 1;
-
-  // Build messages array with current settings and word count request
-  const messagesForApi = buildMessagesForChat(wordCountRequest);
-
-  // Create payload
-  const payload = {
-    model: MODEL_NAME,
-    max_tokens: MAX_TOKENS,
-    top_p: TOP_P,
-    top_k: TOP_K,
-    presence_penalty: PRESENCE_PENALTY,
-    frequency_penalty: FREQUENCY_PENALTY,
-    temperature: TEMPERATURE,
-    messages: messagesForApi
-  };
-  
-  console.log(`Sending request with ${REASONING_METHOD} reasoning ${REASONING_METHOD === "cod" ? `(word limit: ${COD_WORD_LIMIT})` : ""}`);
-  if (wordCountRequest) {
-    console.log(`Final answer word limit requested: ${wordCountRequest} words`);
-  }
-  console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
-
-  try {
-    // Add timestamp to URL to prevent caching
-    const timestamp = new Date().getTime();
-    const cacheBuster = `?t=${timestamp}`;
-    
-    // Set a longer timeout for fetch requests
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 130000); // 130 seconds timeout (slightly longer than server)
-    
-    const response = await fetch(`${API_PROXY_URL}${cacheBuster}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || errorData.error || 'Unknown error'}`);
-    }
-    
-    const data = await response.json();
-    const botReply = data.choices &&
-                     data.choices[0] &&
-                     data.choices[0].message &&
-                     data.choices[0].message.content;
-    if (botReply) {
-      const trimmedReply = botReply.trim();
-      
-      // Create response metadata
-      let reasoningInfo = REASONING_METHOD.toUpperCase();
-      if (REASONING_METHOD === "cod") {
-        reasoningInfo += `-${COD_WORD_LIMIT}`;
+    function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
+      const thread = threads.find(t => t.id === currentThreadId);
+      if (thread) {
+        // Process bot messages to separate thinking from answer
+        let thinking = null;
+        let answer = null;
+        
+        if (sender === "bot" && !isPlaceholder) {
+          const processed = processBotMessage(content, REASONING_METHOD);
+          thinking = processed.thinking;
+          answer = processed.answer;
+        }
+        
+        thread.messages.push({
+          content,
+          sender,
+          isPlaceholder,
+          timestamp: new Date(),
+          wordCount: sender === "bot" && !isPlaceholder ? countWords(content) : undefined,
+          reasoningMethod: sender === "bot" && !isPlaceholder ? 
+            (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
+            undefined,
+          thinking,
+          answer
+        });
+        renderCurrentThreadMessages();
       }
-      
-      // Add enhanced reasoning info if used
-      if (ENHANCED_REASONING_ENABLED && 
-          REASONING_ENHANCEMENT === "adaptive" && 
-          PROBLEM_COMPLEXITY.complexity === "complex") {
-        reasoningInfo += "-ENHANCED";
-      }
-      
-      // Process bot message to separate thinking and answer parts
-      const processed = processBotMessage(trimmedReply, REASONING_METHOD);
-      
-      thread.messages[placeholderIndex] = {
-        content: trimmedReply,
-        sender: "bot",
-        isPlaceholder: false,
-        timestamp: new Date(),
-        wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0),
-        reasoningMethod: reasoningInfo,
-        thinking: processed.thinking,
-        answer: processed.answer,
-        thinkingWordCount: processed.thinkingWordCount || 0,
-        answerWordCount: processed.answerWordCount || 0
-      };
-    } else {
-      thread.messages[placeholderIndex] = {
-        content: "No valid response received. Check model name and API key.",
-        sender: "bot",
-        isPlaceholder: false,
-        timestamp: new Date(),
-        wordCount: 0,
-        reasoningMethod: REASONING_METHOD.toUpperCase(),
-        thinking: null,
-        answer: null,
-        thinkingWordCount: 0,
-        answerWordCount: 0
-      };
-    }
-  } catch (error) {
-    console.error("Error communicating with API:", error);
-    
-    // Provide more detailed error message
-    let errorMessage = "Error communicating with API: " + error.message;
-    
-    // Special handling for timeout errors
-    if (error.name === 'AbortError') {
-      errorMessage = "Request timed out. The model is taking too long to respond. Try:\n";
-      errorMessage += "1. Using a simpler prompt\n";
-      errorMessage += "2. Reducing the max tokens setting\n";
-      errorMessage += "3. Using a different reasoning method or model";
-    } else if (error.message.includes("504") || error.message.includes("Gateway Timeout")) {
-      errorMessage = "Request timed out on the server. Try:\n";
-      errorMessage += "1. Reducing your prompt complexity\n";
-      errorMessage += "2. Using fewer tokens (in Settings > Parameters)\n";
-      errorMessage += "3. Trying a faster model or different reasoning method";
-    } else if (error.message.includes("Failed to fetch")) {
-      errorMessage += "\n\nPossible solutions:\n1. Make sure your API key is set correctly in Netlify\n2. Check that your model name is valid\n3. Verify your internet connection";
-    }
-    
-    thread.messages[placeholderIndex] = {
-      content: errorMessage,
-      sender: "bot",
-      isPlaceholder: false,
-      timestamp: new Date(),
-      wordCount: 0,
-      reasoningMethod: REASONING_METHOD.toUpperCase(),
-      thinking: null,
-      answer: null,
-      thinkingWordCount: 0,
-      answerWordCount: 0
-    };
-  }
-  renderCurrentThreadMessages();
-}
     }
 
     /***********************
      * Build Messages Array for Chat Completions
      ***********************/
-    function buildMessagesForChat(wordCountRequest = null) {
+    function buildMessagesForChat() {
       const thread = threads.find(t => t.id === currentThreadId);
       if (!thread) return [];
       
@@ -2443,107 +1532,17 @@ async function sendMessage(message) {
       
       let systemPrompt = "";
       
-      // Use enhanced reasoning for complex problems if enabled
-      let shouldUseEnhancedPrompt = false;
-      let problemType = "";
-      
-      // Determine if this is a complex problem that needs enhanced reasoning
-      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-        if (PROBLEM_COMPLEXITY.complexity === "complex") {
-          shouldUseEnhancedPrompt = true;
-          problemType = "complex";
-          console.log("Using enhanced prompts for complex problem detected");
-        } 
-        else if (PROBLEM_COMPLEXITY.hasMath && (PROBLEM_COMPLEXITY.multiStep || PROBLEM_COMPLEXITY.hasLogic)) {
-          // Even if not fully "complex", if it has math AND either multi-step reasoning or logic,
-          // it's still worth enhancing the prompt
-          shouldUseEnhancedPrompt = true;
-          problemType = "mathematical";
-          console.log("Using enhanced prompts for mathematical problem detected");
-        }
-      }
-      
       // If we have a reasoning method other than standard, add the system prompt
       if (REASONING_METHOD !== "standard") {
-        // Determine which prompt to use based on complexity and settings
-        if (shouldUseEnhancedPrompt) {
-          if (REASONING_METHOD === "cot") {
-            systemPrompt = ENHANCED_PROMPTS.cot;
-          } else if (REASONING_METHOD === "cod") {
-            // Use the appropriate CoD prompt based on word limit
-            if (COD_WORD_LIMIT === 5) {
-              systemPrompt = ENHANCED_PROMPTS.cod5;
-            } else if (COD_WORD_LIMIT === 10) {
-              systemPrompt = ENHANCED_PROMPTS.cod10;
-            } else if (COD_WORD_LIMIT === 15) {
-              systemPrompt = ENHANCED_PROMPTS.cod15;
-            } else if (COD_WORD_LIMIT === 17) {
-              systemPrompt = ENHANCED_PROMPTS.cod17;
-            } else if (COD_WORD_LIMIT === 20) {
-              systemPrompt = ENHANCED_PROMPTS.cod20;
-            } else {
-              // Fallback to standard prompt but update word limit
-              systemPrompt = PROMPTS[REASONING_METHOD].replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
-            }
-          }
-        } else {
-          // Use the selected reasoning method prompt
-          systemPrompt = PROMPTS[REASONING_METHOD];
-          
-          // If it's COD, update the word limit
-          if (REASONING_METHOD === "cod") {
-            // First update the word limit
-            systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
-            
-            // If this is a problem that needs many steps, add instructions to use more steps
-            if (PROBLEM_COMPLEXITY.estimatedSteps > 5) {
-              // Insert guidance about using sufficient steps after the first paragraph
-              const firstParagraphEnd = systemPrompt.indexOf("\n\n");
-              if (firstParagraphEnd !== -1) {
-                const beforeInsert = systemPrompt.substring(0, firstParagraphEnd);
-                const afterInsert = systemPrompt.substring(firstParagraphEnd);
-                
-                const insertText = `\n\nIMPORTANT: This problem may require ${PROBLEM_COMPLEXITY.estimatedSteps}+ reasoning steps. Use as many steps as needed to fully solve the problem - it's better to break complex reasoning into more simple steps than to skip important details.`;
-                
-                systemPrompt = beforeInsert + insertText + afterInsert;
-              }
-            }
-          }
+        // Use the selected reasoning method prompt
+        systemPrompt = PROMPTS[REASONING_METHOD];
+        
+        // If it's COD, update the word limit
+        if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
+          systemPrompt = systemPrompt.replace(/with \d+ words at most/, `with ${COD_WORD_LIMIT} words at most`);
         }
         
-        // If word count limit was requested, modify the prompt to clarify it applies to final answer only
-        if (wordCountRequest && wordCountRequest > 0) {
-          if (REASONING_METHOD === "cod") {
-            // For CoD, add the instruction right before the examples section
-            const examplesIndex = systemPrompt.indexOf("Examples:");
-            if (examplesIndex !== -1) {
-              const beforeExamples = systemPrompt.substring(0, examplesIndex);
-              const afterExamples = systemPrompt.substring(examplesIndex);
-              
-              systemPrompt = `${beforeExamples}\nIMPORTANT: Your final answer after the #### separator should be ${wordCountRequest} words maximum. The word limit applies ONLY to your final answer, not your thinking steps.\n\n${afterExamples}`;
-            } else {
-              systemPrompt += `\n\nIMPORTANT: Your final answer after the #### separator should be ${wordCountRequest} words maximum. The word limit applies ONLY to your final answer, not your thinking steps.`;
-            }
-          } else if (REASONING_METHOD === "cot") {
-            // For CoT, add to the end of the prompt
-            systemPrompt += `\n\nIMPORTANT: Your final answer should be ${wordCountRequest} words maximum. This word limit applies ONLY to your final answer, not your thinking process.`;
-          }
-        }
-        
-        let reasoningInfo = `${REASONING_METHOD.toUpperCase()}`;
-        if (REASONING_METHOD === "cod") {
-          reasoningInfo += `-${COD_WORD_LIMIT}`;
-        }
-        
-        if (shouldUseEnhancedPrompt) {
-          reasoningInfo += " (Enhanced for complex problem)";
-        }
-        
-        console.log(`Using ${reasoningInfo} prompt`);
-        
-        if (wordCountRequest) {
-          console.log(`Added instruction for ${wordCountRequest} word limit on final answer only`);
-        }
+        console.log(`Using ${REASONING_METHOD.toUpperCase()} prompt ${REASONING_METHOD === "cod" ? "with word limit " + COD_WORD_LIMIT : ""}`);
         
         messages.push({
           role: "system",
@@ -2551,15 +1550,6 @@ async function sendMessage(message) {
         });
       } else {
         console.log("Using standard reasoning (no special prompt)");
-        
-        // If word count limit was requested, add a system message for it
-        if (wordCountRequest && wordCountRequest > 0) {
-          messages.push({
-            role: "system",
-            content: `Please limit your response to ${wordCountRequest} words maximum.`
-          });
-          console.log(`Added instruction for ${wordCountRequest} word limit`);
-        }
       }
       
       // Add all user and assistant messages
@@ -2579,11 +1569,6 @@ async function sendMessage(message) {
      * Message Sending
      ***********************/
     async function sendMessage(message) {
-      // NEW: Analyze problem complexity if enhanced reasoning is enabled
-      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-        analyzeProblemComplexity(message);
-      }
-      
       addMessageToCurrentThread(message, "user");
 
       if (!MODEL_NAME) {
@@ -2593,15 +1578,12 @@ async function sendMessage(message) {
         return;
       }
 
-      // Parse message for word count requirements
-      const wordCountRequest = parseWordCountRequest(message);
-      
       addMessageToCurrentThread("Bot is typing...", "bot", true);
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
 
-      // Build messages array with current settings and word count request
-      const messagesForApi = buildMessagesForChat(wordCountRequest);
+      // Build messages array with current settings
+      const messagesForApi = buildMessagesForChat();
 
       // Create payload
       const payload = {
@@ -2616,9 +1598,6 @@ async function sendMessage(message) {
       };
       
       console.log(`Sending request with ${REASONING_METHOD} reasoning ${REASONING_METHOD === "cod" ? `(word limit: ${COD_WORD_LIMIT})` : ""}`);
-      if (wordCountRequest) {
-        console.log(`Final answer word limit requested: ${wordCountRequest} words`);
-      }
       console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
 
       try {
@@ -2645,18 +1624,12 @@ async function sendMessage(message) {
                          data.choices[0].message.content;
         if (botReply) {
           const trimmedReply = botReply.trim();
+          const wordCount = countWords(trimmedReply);
           
           // Create response metadata
           let reasoningInfo = REASONING_METHOD.toUpperCase();
           if (REASONING_METHOD === "cod") {
             reasoningInfo += `-${COD_WORD_LIMIT}`;
-          }
-          
-          // Add enhanced reasoning info if used
-          if (ENHANCED_REASONING_ENABLED && 
-              REASONING_ENHANCEMENT === "adaptive" && 
-              PROBLEM_COMPLEXITY.complexity === "complex") {
-            reasoningInfo += "-ENHANCED";
           }
           
           // Process bot message to separate thinking and answer parts
@@ -2667,12 +1640,10 @@ async function sendMessage(message) {
             sender: "bot",
             isPlaceholder: false,
             timestamp: new Date(),
-            wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0),
+            wordCount: wordCount,
             reasoningMethod: reasoningInfo,
             thinking: processed.thinking,
-            answer: processed.answer,
-            thinkingWordCount: processed.thinkingWordCount || 0,
-            answerWordCount: processed.answerWordCount || 0
+            answer: processed.answer
           };
         } else {
           thread.messages[placeholderIndex] = {
@@ -2683,9 +1654,7 @@ async function sendMessage(message) {
             wordCount: 0,
             reasoningMethod: REASONING_METHOD.toUpperCase(),
             thinking: null,
-            answer: null,
-            thinkingWordCount: 0,
-            answerWordCount: 0
+            answer: null
           };
         }
       } catch (error) {
@@ -2707,9 +1676,7 @@ async function sendMessage(message) {
           wordCount: 0,
           reasoningMethod: REASONING_METHOD.toUpperCase(),
           thinking: null,
-          answer: null,
-          thinkingWordCount: 0,
-          answerWordCount: 0
+          answer: null
         };
       }
       renderCurrentThreadMessages();
@@ -2742,6 +1709,20 @@ async function sendMessage(message) {
         });
         container.appendChild(copyBtn);
       });
+    }
+
+    function transformMessage(content) {
+      // Replace code blocks with syntax highlighting
+      const transformed = content.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
+        let language = '';
+        const lines = codeContent.split('\n');
+        if (lines.length > 0 && !lines[0].includes(' ')) {
+          language = lines[0].trim();
+          lines.shift();
+        }
+        return `<pre><code class="${language}">${lines.join('\n')}</code></pre>`;
+      });
+      return transformed;
     }
 
     /***********************
@@ -2875,136 +1856,6 @@ async function sendMessage(message) {
       });
     }
     
-    // Improved Chain of Draft word limit options UI
-    function updateCoDOptionsUI() {
-      const codOptions = document.getElementById('codOptions');
-      if (!codOptions) return;
-      
-      codOptions.innerHTML = `
-        <div class="option-label">Word limit per step:</div>
-        <div class="cod-word-limit-options">
-          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 5 ? 'selected' : ''}" data-value="5">
-            <span class="cod-word-limit-value">5 words</span>
-            <span class="cod-word-limit-desc">Original paper recommendation</span>
-          </div>
-          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 10 ? 'selected' : ''}" data-value="10">
-            <span class="cod-word-limit-value">10 words</span>
-            <span class="cod-word-limit-desc">Balanced brevity and clarity</span>
-          </div>
-          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 15 ? 'selected' : ''}" data-value="15">
-            <span class="cod-word-limit-value">15 words</span>
-            <span class="cod-word-limit-desc">More descriptive steps</span>
-          </div>
-          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 17 ? 'selected' : ''}" data-value="17">
-            <span class="cod-word-limit-value">17 words</span>
-            <span class="cod-word-limit-desc">Better for complex reasoning</span>
-          </div>
-          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 20 ? 'selected' : ''}" data-value="20">
-            <span class="cod-word-limit-value">20 words</span>
-            <span class="cod-word-limit-desc">Detailed steps for math & logic</span>
-          </div>
-        </div>
-        
-        <div class="cod-examples">
-          <div class="cod-examples-header">Chain of Draft Example</div>
-          <div class="cod-example-item">
-            <div class="cod-example-question">Q: If a fabric store received 45 yards of cotton and used 2/9 of it, how many yards remain?</div>
-            <div class="cod-example-answer">A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #### 35 yards</div>
-          </div>
-        </div>
-      `;
-      
-      // Add event listeners to the word limit options
-      const wordLimitOptions = document.querySelectorAll('.cod-word-limit-option');
-      wordLimitOptions.forEach(option => {
-        option.addEventListener('click', () => {
-          // Update selected state
-          wordLimitOptions.forEach(opt => opt.classList.remove('selected'));
-          option.classList.add('selected');
-          
-          // Update word limit value
-          COD_WORD_LIMIT = parseInt(option.getAttribute('data-value'));
-          
-          // Update the prompt
-          updateCoDPrompt();
-          
-          // Update display
-          updateCurrentModelDisplay();
-        });
-      });
-    }
-    
-    // Improved function to update the CoD prompt when word limit changes
-    function updateCoDPrompt() {
-      // Update the prompt to reflect new word limit
-      const basePrompt = `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
-  
-Separate your steps with periods. Write your final answer after the #### separator.`;
-      
-      // Keep the examples part of the prompt
-      const examplesStart = PROMPTS.cod.indexOf('Examples:');
-      if (examplesStart !== -1) {
-        PROMPTS.cod = basePrompt + '\n\n' + PROMPTS.cod.substring(examplesStart);
-      } else {
-        PROMPTS.cod = basePrompt;
-      }
-      
-      console.log(`Updated CoD prompt with word limit: ${COD_WORD_LIMIT}`);
-    }
-    
-    // Setup Enhanced Reasoning options
-    function setupEnhancedReasoningOptions() {
-      const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-      const optionsContainer = document.getElementById('enhancedReasoningOptions');
-      const adaptiveRadio = document.getElementById('adaptiveReasoning');
-      const standardRadio = document.getElementById('standardReasoning');
-      
-      // Initialize state
-      if (enhancedToggle) {
-        enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
-        if (optionsContainer) {
-          optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-        }
-      }
-      
-      if (adaptiveRadio && standardRadio) {
-        if (REASONING_ENHANCEMENT === 'adaptive') {
-          adaptiveRadio.checked = true;
-        } else {
-          standardRadio.checked = true;
-        }
-      }
-      
-      // Add event listeners
-      if (enhancedToggle) {
-        enhancedToggle.addEventListener('change', () => {
-          ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
-          if (optionsContainer) {
-            optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-          }
-          updateCurrentModelDisplay();
-        });
-      }
-      
-      if (adaptiveRadio) {
-        adaptiveRadio.addEventListener('change', () => {
-          if (adaptiveRadio.checked) {
-            REASONING_ENHANCEMENT = 'adaptive';
-            updateCurrentModelDisplay();
-          }
-        });
-      }
-      
-      if (standardRadio) {
-        standardRadio.addEventListener('change', () => {
-          if (standardRadio.checked) {
-            REASONING_ENHANCEMENT = 'standard';
-            updateCurrentModelDisplay();
-          }
-        });
-      }
-    }
-    
     // Setup COD options display
     function setupCODOptions() {
       const reasoningRadios = document.getElementsByName('reasoningMethod');
@@ -3013,7 +1864,6 @@ Separate your steps with periods. Write your final answer after the #### separat
       // Initial state
       if (REASONING_METHOD === 'cod') {
         codOptions.style.display = 'block';
-        updateCoDOptionsUI();
       } else {
         codOptions.style.display = 'none';
       }
@@ -3023,11 +1873,16 @@ Separate your steps with periods. Write your final answer after the #### separat
         radio.addEventListener('change', () => {
           if (radio.value === 'cod' && radio.checked) {
             codOptions.style.display = 'block';
-            updateCoDOptionsUI();
           } else {
             codOptions.style.display = 'none';
           }
         });
+      });
+      
+      // Setup word limit dropdown
+      const wordLimitSelect = document.getElementById('codWordLimit');
+      wordLimitSelect.addEventListener('change', () => {
+        COD_WORD_LIMIT = parseInt(wordLimitSelect.value);
       });
     }
     
@@ -3056,25 +1911,9 @@ Separate your steps with periods. Write your final answer after the #### separat
         const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
         if (reasoningRadio) reasoningRadio.checked = true;
         
-        // Set enhanced reasoning options
-        const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-        if (enhancedToggle) enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
-        
-        const enhancedOptionsContainer = document.getElementById('enhancedReasoningOptions');
-        if (enhancedOptionsContainer) {
-          enhancedOptionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-        }
-        
-        const adaptiveRadio = document.getElementById('adaptiveReasoning');
-        const standardRadio = document.getElementById('standardReasoning');
-        
-        if (adaptiveRadio && standardRadio) {
-          if (REASONING_ENHANCEMENT === 'adaptive') {
-            adaptiveRadio.checked = true;
-          } else {
-            standardRadio.checked = true;
-          }
-        }
+        // Set COD word limit
+        const codWordLimit = document.getElementById("codWordLimit");
+        if (codWordLimit) codWordLimit.value = COD_WORD_LIMIT.toString();
         
         // Set parameter sliders
         setSliderAndValue("temp", TEMPERATURE);
@@ -3113,8 +1952,6 @@ Separate your steps with periods. Write your final answer after the #### separat
         // Save previous settings for comparison
         const prevMethod = REASONING_METHOD;
         const prevWordLimit = COD_WORD_LIMIT;
-        const prevEnhanced = ENHANCED_REASONING_ENABLED;
-        const prevEnhancementType = REASONING_ENHANCEMENT;
         
         // Save model name
         const modelNameEl = document.getElementById("modelName");
@@ -3134,27 +1971,9 @@ Separate your steps with periods. Write your final answer after the #### separat
         
         // Save COD word limit if applicable
         if (REASONING_METHOD === "cod") {
-          // Get the selected CoD word limit option
-          const selectedOption = document.querySelector('.cod-word-limit-option.selected');
-          if (selectedOption) {
-            COD_WORD_LIMIT = parseInt(selectedOption.getAttribute('data-value'));
-          }
-        }
-        
-        // Save enhanced reasoning settings
-        const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-        if (enhancedToggle) {
-          ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
-        }
-        
-        const adaptiveRadio = document.getElementById('adaptiveReasoning');
-        const standardRadio = document.getElementById('standardReasoning');
-        
-        if (adaptiveRadio && standardRadio) {
-          if (adaptiveRadio.checked) {
-            REASONING_ENHANCEMENT = 'adaptive';
-          } else if (standardRadio.checked) {
-            REASONING_ENHANCEMENT = 'standard';
+          const codWordLimitEl = document.getElementById("codWordLimit");
+          if (codWordLimitEl) {
+            COD_WORD_LIMIT = parseInt(codWordLimitEl.value);
           }
         }
         
@@ -3179,8 +1998,6 @@ Separate your steps with periods. Write your final answer after the #### separat
           localStorage.setItem("modelName", MODEL_NAME);
           localStorage.setItem("reasoningMethod", REASONING_METHOD);
           localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
-          localStorage.setItem("enhancedReasoningEnabled", ENHANCED_REASONING_ENABLED.toString());
-          localStorage.setItem("reasoningEnhancement", REASONING_ENHANCEMENT);
           localStorage.setItem("temperature", TEMPERATURE.toString());
           localStorage.setItem("topP", TOP_P.toString());
           localStorage.setItem("topK", TOP_K.toString());
@@ -3190,7 +2007,6 @@ Separate your steps with periods. Write your final answer after the #### separat
           
           // Save custom prompts
           localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
-          localStorage.setItem("enhancedPrompts", JSON.stringify(ENHANCED_PROMPTS));
           console.log("Settings saved to localStorage");
         } catch (storageErr) {
           console.error("Error saving to localStorage:", storageErr);
@@ -3200,9 +2016,7 @@ Separate your steps with periods. Write your final answer after the #### separat
         
         // Check if reasoning method or COD word limit changed and notify user
         if (prevMethod !== REASONING_METHOD || 
-            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT) ||
-            prevEnhanced !== ENHANCED_REASONING_ENABLED ||
-            prevEnhancementType !== REASONING_ENHANCEMENT) {
+            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT)) {
           showNotification("Settings saved - reasoning method changed. Next message will use new settings.");
         } else {
           showNotification("Settings saved");
@@ -3279,7 +2093,6 @@ Separate your steps with periods. Write your final answer after the #### separat
             setupTabNavigation();
             setupModelInput();
             setupCODOptions();
-            setupEnhancedReasoningOptions();
             setupSliders();
             console.log("UI functionality setup complete");
           } catch (err) {
@@ -3304,31 +2117,12 @@ Separate your steps with periods. Write your final answer after the #### separat
         const codWordLimit = localStorage.getItem("codWordLimit");
         if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
         
-        // Load enhanced reasoning settings
-        const enhancedEnabled = localStorage.getItem("enhancedReasoningEnabled");
-        if (enhancedEnabled !== null) {
-          ENHANCED_REASONING_ENABLED = enhancedEnabled === "true";
-        }
-        
-        const enhancementType = localStorage.getItem("reasoningEnhancement");
-        if (enhancementType) {
-          REASONING_ENHANCEMENT = enhancementType;
-        }
-        
         // Load custom prompts if available
         const storedPrompts = localStorage.getItem("customPrompts");
         if (storedPrompts) {
           const parsedPrompts = JSON.parse(storedPrompts);
           // Merge with default prompts to ensure all properties exist
           PROMPTS = { ...PROMPTS, ...parsedPrompts };
-        }
-        
-        // Load enhanced prompts if available
-        const storedEnhancedPrompts = localStorage.getItem("enhancedPrompts");
-        if (storedEnhancedPrompts) {
-          const parsedEnhancedPrompts = JSON.parse(storedEnhancedPrompts);
-          // Merge with default prompts to ensure all properties exist
-          ENHANCED_PROMPTS = { ...ENHANCED_PROMPTS, ...parsedEnhancedPrompts };
         }
         
         const temp = localStorage.getItem("temperature");
@@ -3359,10 +2153,6 @@ Separate your steps with periods. Write your final answer after the #### separat
       try {
         loadPersistedSettings();
         console.log("Settings loaded");
-        
-        // Update CoD prompt with the correct word limit
-        updateCoDPrompt();
-        console.log("CoD prompt updated");
         
         createNewThread();
         console.log("New thread created");
@@ -3429,16 +2219,16 @@ Separate your steps with periods. Write your final answer after the #### separat
     }
   </script>
   <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
-    <input type="hidden" name="form-name" value="feedback">
-    <input type="hidden" name="model">
-    <input type="hidden" name="reasoning_method">
-    <select name="feedback_type"></select>
-    <input type="radio" name="rating" value="1">
-    <input type="radio" name="rating" value="2">
-    <input type="radio" name="rating" value="3">
-    <input type="radio" name="rating" value="4">
-    <input type="radio" name="rating" value="5">
-    <textarea name="comments"></textarea>
-  </form>
+  <input type="hidden" name="form-name" value="feedback">
+  <input type="hidden" name="model">
+  <input type="hidden" name="reasoning_method">
+  <select name="feedback_type"></select>
+  <input type="radio" name="rating" value="1">
+  <input type="radio" name="rating" value="2">
+  <input type="radio" name="rating" value="3">
+  <input type="radio" name="rating" value="4">
+  <input type="radio" name="rating" value="5">
+  <textarea name="comments"></textarea>
+</form>
 </body>
 </html>
