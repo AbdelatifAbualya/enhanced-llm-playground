@@ -1340,23 +1340,42 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
     
     // NEW: Enhanced prompts for complex problems with different word limits
     let ENHANCED_PROMPTS = {
-      cot: `Think step by step to solve this problem. This appears to be a complex problem that requires careful reasoning. Break down your thinking into clear steps, making sure to consider all relevant information and constraints. Check your calculations and logic at each step. After you've completed your reasoning process, provide your final answer.`,
+      cot: `Think step by step to solve this problem. This appears to be a complex problem that requires careful reasoning. Break down your thinking into clear steps, making sure to consider all relevant information and constraints. 
+
+For complex problems, use as many steps as needed to work through the solution thoroughly. It's better to use more steps with clear reasoning than to skip steps.
+
+Check your calculations and logic at each step. After you've completed your reasoning process, provide your final answer.`,
       
-      cod5: `Think step by step to solve this complex problem. For each step, use at most 5 words to capture the essential reasoning. Use mathematical notation where efficient. Show all key intermediate calculations and logical inferences, even if this requires more steps than usual.
+      cod5: `Think step by step to solve this complex problem. For each step, use at most 5 words to capture the essential reasoning, but use AS MANY STEPS as needed to thoroughly work through the problem. Use mathematical notation where efficient. Show ALL intermediate calculations and logical inferences.
+
+IMPORTANT: Instead of trying to fit complex reasoning into fewer steps, break your reasoning into more numerous simple steps. For example, instead of one step with "Calculate area using length×width=50×30=1500", use multiple steps:
+1. Length = 50.
+2. Width = 30.
+3. Area = length × width.
+4. Area = 50 × 30.
+5. Area = 1500.
 
 Separate your steps with periods. Write your final answer after the #### separator.
 
-Example of solving a complex problem with minimal steps:
+Example of solving a complex problem with sufficient steps:
 Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: 60 mph × 2h = 120 miles. Second segment: 75 mph × 1h = 75 miles. Last segment: 50 mph × 0.5h = 25 miles. Total distance: 120 + 75 + 25 = 220 miles. #### 220 miles`,
+A: First segment: speed 60 mph. First segment: time 2h. First segment: distance = 60 × 2. First segment: distance = 120 miles. Second segment: speed 75 mph. Second segment: time 1h. Second segment: distance = 75 × 1. Second segment: distance = 75 miles. Third segment: speed 50 mph. Third segment: time 0.5h. Third segment: distance = 50 × 0.5. Third segment: distance = 25 miles. Total distance: 120 + 75 + 25. Total distance = 220 miles. #### 220 miles`,
 
-      cod10: `Think step by step to solve this complex problem. For each step, use up to 10 words to capture the essential reasoning. Use mathematical notation where helpful. Include all important intermediate calculations and logical inferences, using more steps if necessary to handle the complexity.
+      cod10: `Think step by step to solve this complex problem. For each step, use up to 10 words to capture the essential reasoning. Use AS MANY STEPS as needed to fully solve the problem. Include ALL intermediate calculations and logical inferences.
+
+IMPORTANT: For complex problems, it's better to use more steps with clear reasoning than to try cramming too much into each step. Break complex calculations into multiple steps.
+
+When thinking through difficult parts of a problem:
+1. Identify what information you need
+2. Think about how to derive that information
+3. Perform calculations systematically
+4. Check your work at key points
 
 Separate your steps with periods. Write your final answer after the #### separator.
 
 Example of solving a complex problem:
 Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: speed 60 mph for 2 hours, distance = 120 miles. Second segment: speed 75 mph for 1 hour, distance = 75 miles. Third segment: speed 50 mph for 0.5 hours, distance = 25 miles. Total distance traveled = 120 + 75 + 25 = 220 miles. #### 220 miles`,
+A: First segment: speed 60 mph for 2 hours. First segment distance calculation: 60 mph × 2h. First segment distance = 120 miles. Second segment: speed 75 mph for 1 hour. Second segment distance calculation: 75 mph × 1h. Second segment distance = 75 miles. Third segment: speed 50 mph for 0.5 hours. Third segment distance calculation: 50 mph × 0.5h. Third segment distance = 25 miles. Need to sum all segment distances. Total distance calculation: 120 + 75 + 25. Total distance traveled = 220 miles. #### 220 miles`,
       
       cod15: `Think step by step to solve this complex problem. For each step, use up to 15 words to capture the essential reasoning, providing more detail for critical steps. Use mathematical notation where helpful but include explanations of your approach at key points.
 
@@ -1549,7 +1568,9 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
         hasMath: false,
         hasLogic: false,
         multiStep: false,
-        complexity: "normal"
+        complexity: "normal",
+        wordCount: message.split(/\s+/).length, // Count words in the problem
+        estimatedSteps: 0 // Will be calculated below
       };
       
       // Mathematical expressions and calculations
@@ -1629,10 +1650,37 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       // Update complexity level
       if (complexityScore >= 3) {
         PROBLEM_COMPLEXITY.complexity = "complex";
+        // Estimate number of steps needed based on problem length and complexity
+        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
+          5, 
+          Math.min(20, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 15))
+        );
       } else if (complexityScore >= 1) {
         PROBLEM_COMPLEXITY.complexity = "normal";
+        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
+          3, 
+          Math.min(10, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 20))
+        );
       } else {
         PROBLEM_COMPLEXITY.complexity = "simple";
+        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
+          2, 
+          Math.min(5, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 25))
+        );
+      }
+      
+      // Adjust the estimated steps based on problem characteristics
+      if (PROBLEM_COMPLEXITY.hasMath && PROBLEM_COMPLEXITY.multiStep) {
+        PROBLEM_COMPLEXITY.estimatedSteps += 2; // Add more steps for multi-step math problems
+      }
+      
+      if (PROBLEM_COMPLEXITY.hasLogic) {
+        PROBLEM_COMPLEXITY.estimatedSteps += 1; // Add more steps for logical reasoning
+      }
+      
+      // If the problem has math expressions, ensure minimum steps
+      if (PROBLEM_COMPLEXITY.hasMath) {
+        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(PROBLEM_COMPLEXITY.estimatedSteps, 4);
       }
       
       console.log(`Problem analysis: ${JSON.stringify(PROBLEM_COMPLEXITY)}`);
@@ -2280,12 +2328,22 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       
       // Use enhanced reasoning for complex problems if enabled
       let shouldUseEnhancedPrompt = false;
+      let problemType = "";
       
-      if (ENHANCED_REASONING_ENABLED && 
-          REASONING_ENHANCEMENT === "adaptive" && 
-          PROBLEM_COMPLEXITY.complexity === "complex") {
-        shouldUseEnhancedPrompt = true;
-        console.log("Using enhanced prompts for complex problem detected");
+      // Determine if this is a complex problem that needs enhanced reasoning
+      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
+        if (PROBLEM_COMPLEXITY.complexity === "complex") {
+          shouldUseEnhancedPrompt = true;
+          problemType = "complex";
+          console.log("Using enhanced prompts for complex problem detected");
+        } 
+        else if (PROBLEM_COMPLEXITY.hasMath && (PROBLEM_COMPLEXITY.multiStep || PROBLEM_COMPLEXITY.hasLogic)) {
+          // Even if not fully "complex", if it has math AND either multi-step reasoning or logic,
+          // it's still worth enhancing the prompt
+          shouldUseEnhancedPrompt = true;
+          problemType = "mathematical";
+          console.log("Using enhanced prompts for mathematical problem detected");
+        }
       }
       
       // If we have a reasoning method other than standard, add the system prompt
@@ -2316,8 +2374,23 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           systemPrompt = PROMPTS[REASONING_METHOD];
           
           // If it's COD, update the word limit
-          if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
+          if (REASONING_METHOD === "cod") {
+            // First update the word limit
             systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+            
+            // If this is a problem that needs many steps, add instructions to use more steps
+            if (PROBLEM_COMPLEXITY.estimatedSteps > 5) {
+              // Insert guidance about using sufficient steps after the first paragraph
+              const firstParagraphEnd = systemPrompt.indexOf("\n\n");
+              if (firstParagraphEnd !== -1) {
+                const beforeInsert = systemPrompt.substring(0, firstParagraphEnd);
+                const afterInsert = systemPrompt.substring(firstParagraphEnd);
+                
+                const insertText = `\n\nIMPORTANT: This problem may require ${PROBLEM_COMPLEXITY.estimatedSteps}+ reasoning steps. Use as many steps as needed to fully solve the problem - it's better to break complex reasoning into more simple steps than to skip important details.`;
+                
+                systemPrompt = beforeInsert + insertText + afterInsert;
+              }
+            }
           }
         }
         
