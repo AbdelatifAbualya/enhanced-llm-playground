@@ -8,6 +8,13 @@
   # Directory with the serverless functions
   functions = "netlify/functions"
 
+# Set function timeout to 120 seconds (2 minutes)
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["node-fetch"]
+  included_files = []
+  timeout = "120"
+
 # Properly configured redirect for single-page application
 [[redirects]]
   from = "/*"
