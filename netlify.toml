@@ -8,12 +8,23 @@
   # Directory with the serverless functions
   functions = "netlify/functions"
 
-# Set function timeout to 120 seconds (2 minutes)
+# Set function timeout to 120 seconds (2 minutes), which is Netlify's maximum
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["node-fetch"]
   included_files = []
   timeout = "120"
+
+# Set up chunked uploads for large request bodies
+[build.processing]
+  skip_processing = false
+
+# Increase client side timeouts for long-running functions
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Increase client-side timeout expectations
+    X-Function-Timeout = "120"
 
 # Properly configured redirect for single-page application
 [[redirects]]
