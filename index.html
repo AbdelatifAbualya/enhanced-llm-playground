@@ -822,6 +822,175 @@
     .count-answer {
       color: #90cdf4;
     }
+    
+    /* NEW STYLING: Enhanced reasoning features */
+    .advanced-options-header {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin: 15px 0 8px 0;
+      color: #ddd;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #555;
+      transition: .4s;
+      border-radius: 22px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #4a8cff;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+    
+    .enhanced-reasoning {
+      background-color: #2a3746;
+      border: 1px solid #3d4e63;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    
+    .enhanced-reasoning-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .enhanced-reasoning-option input[type="radio"] {
+      margin-right: 10px;
+    }
+    
+    .option-description {
+      margin-left: 25px;
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+    
+    .complexity-indicator {
+      display: flex;
+      margin-top: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .complexity-level {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .complexity-bar {
+      height: 5px;
+      background-color: #3d4e63;
+      margin-top: 5px;
+      border-radius: 2px;
+      width: 100%;
+    }
+    
+    .complexity-label {
+      font-size: 0.75rem;
+      color: #90cdf4;
+    }
+    
+    .preset-type {
+      display: inline-block;
+      padding: 3px 8px;
+      background-color: #2c3a4f;
+      color: #90cdf4;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      margin-left: 8px;
+    }
+    
+    /* Auto-detection indicator */
+    .auto-detection-badge {
+      display: inline-flex;
+      align-items: center;
+      background-color: #394e6a;
+      color: #a3c5e9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      margin-left: 7px;
+    }
+    
+    .auto-detection-badge .indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: #68d391;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    
+    /* Help panel for complex problems */
+    .problem-analyzer {
+      margin-top: 15px;
+      background-color: #2a3746;
+      border: 1px solid #3d4e63;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .analyzer-title {
+      font-weight: 500;
+      color: #90cdf4;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .analyzer-icon {
+      margin-right: 6px;
+      color: #68d391;
+    }
+    
+    .analyzer-help {
+      font-size: 0.85rem;
+      color: #bbb;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
@@ -937,6 +1106,50 @@
           <!-- COD Word Limit options -->
           <div id="codOptions" class="cod-options">
             <!-- This will be populated by the updateCoDOptionsUI function -->
+          </div>
+        </div>
+        
+        <!-- NEW: Enhanced Reasoning Controls -->
+        <div class="advanced-options-header">
+          Advanced Reasoning Options
+          <label class="toggle-switch">
+            <input type="checkbox" id="enhancedReasoningToggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        
+        <div id="enhancedReasoningOptions" class="enhanced-reasoning">
+          <div class="enhanced-reasoning-option">
+            <input type="radio" id="adaptiveReasoning" name="reasoningEnhancement" value="adaptive" checked>
+            <label for="adaptiveReasoning">Adaptive Reasoning</label>
+            <span class="auto-detection-badge"><span class="indicator"></span>Auto</span>
+          </div>
+          <div class="option-description">
+            Automatically increases reasoning depth for complex problems (math, logic, multi-step reasoning).
+          </div>
+          
+          <div class="enhanced-reasoning-option">
+            <input type="radio" id="standardReasoning" name="reasoningEnhancement" value="standard">
+            <label for="standardReasoning">Fixed Reasoning Depth</label>
+          </div>
+          <div class="option-description">
+            Uses the same reasoning approach for all problems regardless of complexity.
+          </div>
+          
+          <div class="problem-analyzer">
+            <div class="analyzer-title">
+              <span class="analyzer-icon">🔍</span> Problem Complexity Detection
+            </div>
+            <div class="analyzer-help">
+              When adaptive reasoning is enabled, the system will automatically analyze your questions to detect:
+              <ul style="margin-top: 5px; padding-left: 20px; font-size: 0.85rem;">
+                <li>Mathematical expressions and calculations</li>
+                <li>Multi-step reasoning requirements</li>
+                <li>Logical dependencies and constraints</li>
+                <li>Complex or abstract concepts</li>
+              </ul>
+              For complex problems, the model will use more detailed reasoning steps even with CoD.
+            </div>
           </div>
         </div>
       </div>
@@ -1086,9 +1299,22 @@
     // COD Word Limit
     let COD_WORD_LIMIT = 5;
     
+    // NEW: Enhanced reasoning controls
+    let ENHANCED_REASONING_ENABLED = true;
+    let REASONING_ENHANCEMENT = "adaptive"; // Options: "adaptive", "standard"
+    
+    // NEW: Problem complexity detection
+    let PROBLEM_COMPLEXITY = {
+      hasMath: false,
+      hasLogic: false,
+      multiStep: false,
+      complexity: "normal" // Options: "simple", "normal", "complex"
+    };
+    
     // Prompts for different reasoning methods
     let PROMPTS = {
       standard: "",
+      
       cot: `Think step by step to solve this problem. Explain your reasoning at each step, then provide your final answer.`,
       
       cod: `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
@@ -1110,6 +1336,51 @@ A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #
 
 Q: The temperature on Monday was -3°C. On Tuesday, it was 14°C. What was the change in temperature from Monday to Tuesday?
 A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
+    };
+    
+    // NEW: Enhanced prompts for complex problems with different word limits
+    let ENHANCED_PROMPTS = {
+      cot: `Think step by step to solve this problem. This appears to be a complex problem that requires careful reasoning. Break down your thinking into clear steps, making sure to consider all relevant information and constraints. Check your calculations and logic at each step. After you've completed your reasoning process, provide your final answer.`,
+      
+      cod5: `Think step by step to solve this complex problem. For each step, use at most 5 words to capture the essential reasoning. Use mathematical notation where efficient. Show all key intermediate calculations and logical inferences, even if this requires more steps than usual.
+
+Separate your steps with periods. Write your final answer after the #### separator.
+
+Example of solving a complex problem with minimal steps:
+Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
+A: First segment: 60 mph × 2h = 120 miles. Second segment: 75 mph × 1h = 75 miles. Last segment: 50 mph × 0.5h = 25 miles. Total distance: 120 + 75 + 25 = 220 miles. #### 220 miles`,
+
+      cod10: `Think step by step to solve this complex problem. For each step, use up to 10 words to capture the essential reasoning. Use mathematical notation where helpful. Include all important intermediate calculations and logical inferences, using more steps if necessary to handle the complexity.
+
+Separate your steps with periods. Write your final answer after the #### separator.
+
+Example of solving a complex problem:
+Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
+A: First segment: speed 60 mph for 2 hours, distance = 120 miles. Second segment: speed 75 mph for 1 hour, distance = 75 miles. Third segment: speed 50 mph for 0.5 hours, distance = 25 miles. Total distance traveled = 120 + 75 + 25 = 220 miles. #### 220 miles`,
+      
+      cod15: `Think step by step to solve this complex problem. For each step, use up to 15 words to capture the essential reasoning, providing more detail for critical steps. Use mathematical notation where helpful but include explanations of your approach at key points.
+
+Separate your steps with periods. Write your final answer after the #### separator.
+
+Example of solving a complex problem:
+Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
+A: First segment: The car travels at 60 mph for 2 hours, so distance = 60 × 2 = 120 miles. Second segment: The car increases to 75 mph for 1 hour, so distance = 75 × 1 = 75 miles. Third segment: The car decreases to 50 mph for 0.5 hours, so distance = 50 × 0.5 = 25 miles. Total distance traveled = 120 + 75 + 25 = 220 miles. #### 220 miles`,
+      
+      cod17: `Think step by step to solve this complex problem. For each step, use up to 17 words to provide clear reasoning, especially for difficult parts. Balance precision and concision, using math notation to save words.
+
+Separate your steps with periods. Write your final answer after the #### separator.
+
+Example of solving a complex problem:
+Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
+A: First segment: The car travels at 60 mph for 2 hours, giving distance = 60 × 2 = 120 miles. Second segment: Speed increases to 75 mph for 1 hour, so this segment's distance = 75 miles. Third segment: Speed is 50 mph for 0.5 hours, contributing 50 × 0.5 = 25 miles. Total journey distance = 120 + 75 + 25 = 220 miles. #### 220 miles`,
+      
+      cod20: `Think step by step to solve this complex problem. For each step, use up to 20 words to provide clear reasoning, explaining your approach more thoroughly for the difficult parts of the problem.
+
+Separate your steps with periods. Write your final answer after the #### separator.
+
+Example of solving a complex problem:
+Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
+A: First segment: The car travels at 60 mph for 2 hours, so the distance covered in this segment is 60 × 2 = 120 miles. Second segment: The car then increases speed to 75 mph and maintains this for 1 hour, covering 75 × 1 = 75 miles. Third segment: Finally, the car decreases speed to 50 mph for 30 minutes (0.5 hours), covering 50 × 0.5 = 25 miles. Total distance traveled over the entire journey = 120 + 75 + 25 = 220 miles. #### 220 miles`
     };
     
     // Default generation parameters
@@ -1147,6 +1418,11 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           case "cod":
             reasoningBadge = `<span class="reasoning-badge" style="background-color: #2c6b9c;">CoD-${COD_WORD_LIMIT}</span>`;
             break;
+        }
+        
+        // Add enhanced reasoning badge if enabled
+        if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
+          reasoningBadge += '<span class="reasoning-badge" style="background-color: #2d5038; margin-left: 3px;">Adaptive</span>';
         }
         
         element.innerHTML = displayText + reasoningBadge;
@@ -1262,6 +1538,106 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
       // Split by whitespace and filter out empty strings
       const words = processedText.split(/\s+/).filter(word => word.length > 0);
       return words.length;
+    }
+
+    /***********************
+     * NEW: Problem Complexity Analysis
+     ***********************/
+    function analyzeProblemComplexity(message) {
+      // Reset current complexity
+      PROBLEM_COMPLEXITY = {
+        hasMath: false,
+        hasLogic: false,
+        multiStep: false,
+        complexity: "normal"
+      };
+      
+      // Mathematical expressions and calculations
+      const mathPatterns = [
+        /[0-9\s][\+\-\*\/\=\(\)][0-9\s]/,  // Basic operations
+        /\d+\s*\^\s*\d+/,                  // Powers
+        /\d+\s*\/\s*\d+/,                  // Fractions
+        /(?:sin|cos|tan|log|ln|sqrt|exp)/i, // Math functions
+        /\[\s*[^\]]+\s*\]/,                // Matrix notation
+        /\{\s*[^\}]+\s*\}/,                // Set notation
+        /[\+\-]\s*[\d\.]+[eE][\+\-]\d+/,   // Scientific notation
+        /\d+\s*%/,                         // Percentages
+      ];
+      
+      // Logical expressions
+      const logicPatterns = [
+        /(?:if|then|else|therefore|because|implies|since|hence|thus|consequently)/i,
+        /(?:and|or|not|xor|nor|all|some|every|any|none)/i,
+        /(?:true|false|valid|invalid|prove|QED|contradiction|logical|premise|conclusion)/i,
+      ];
+      
+      // Indicators of multi-step problems
+      const multiStepPatterns = [
+        /(?:first|second|third|next|then|after|finally|lastly|step|phase)/i,
+        /(?:find the total|calculate the|determine the|solve for)/i,
+        /(?:per month|per year|initially|eventually|ultimately|before|after)/i,
+        /(?:increases by|decreases by|changes by|grows|reduces)/i,
+      ];
+      
+      // Check for math patterns
+      for (const pattern of mathPatterns) {
+        if (pattern.test(message)) {
+          PROBLEM_COMPLEXITY.hasMath = true;
+          break;
+        }
+      }
+      
+      // Check for logic patterns
+      for (const pattern of logicPatterns) {
+        if (pattern.test(message)) {
+          PROBLEM_COMPLEXITY.hasLogic = true;
+          break;
+        }
+      }
+      
+      // Check for multi-step patterns
+      for (const pattern of multiStepPatterns) {
+        if (pattern.test(message)) {
+          PROBLEM_COMPLEXITY.multiStep = true;
+          break;
+        }
+      }
+      
+      // Determine complexity
+      let complexityScore = 0;
+      if (PROBLEM_COMPLEXITY.hasMath) complexityScore += 1;
+      if (PROBLEM_COMPLEXITY.hasLogic) complexityScore += 1;
+      if (PROBLEM_COMPLEXITY.multiStep) complexityScore += 1;
+      
+      // Apply more specific pattern checks
+      
+      // Advanced math indicators
+      if (/(?:calculus|differential|integral|equation system|probability|statistics|algebra|geometry)/i.test(message)) {
+        complexityScore += 1;
+      }
+      
+      // Long problems are often complex
+      if (message.length > 500) {
+        complexityScore += 1;
+      }
+      
+      // Multiple constraints or variables
+      if (message.match(/(?:constraint|variable|unknown|factor|parameter|condition)/gi)?.length > 2) {
+        complexityScore += 1;
+      }
+      
+      // Update complexity level
+      if (complexityScore >= 3) {
+        PROBLEM_COMPLEXITY.complexity = "complex";
+      } else if (complexityScore >= 1) {
+        PROBLEM_COMPLEXITY.complexity = "normal";
+      } else {
+        PROBLEM_COMPLEXITY.complexity = "simple";
+      }
+      
+      console.log(`Problem analysis: ${JSON.stringify(PROBLEM_COMPLEXITY)}`);
+      
+      return PROBLEM_COMPLEXITY;
     }
 
     /***********************
@@ -1883,7 +2259,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           thinking,
           answer,
           thinkingWordCount: sender === "bot" && !isPlaceholder ? thinkingWordCount : undefined,
-          answerWordCount: sender === "bot" && !isPlaceholder ? answerWordCount : undefined
+          answerWordCount: sender === "bot" && !isPlaceholder ? answerWordCount : undefined,
+          // NEW: Add complexity info for debugging
+          complexityInfo: sender === "user" ? PROBLEM_COMPLEXITY : undefined
         });
         renderCurrentThreadMessages();
       }
@@ -1900,14 +2278,47 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
       
       let systemPrompt = "";
       
+      // Use enhanced reasoning for complex problems if enabled
+      let shouldUseEnhancedPrompt = false;
+      
+      if (ENHANCED_REASONING_ENABLED && 
+          REASONING_ENHANCEMENT === "adaptive" && 
+          PROBLEM_COMPLEXITY.complexity === "complex") {
+        shouldUseEnhancedPrompt = true;
+        console.log("Using enhanced prompts for complex problem detected");
+      }
+      
       // If we have a reasoning method other than standard, add the system prompt
       if (REASONING_METHOD !== "standard") {
-        // Use the selected reasoning method prompt
-        systemPrompt = PROMPTS[REASONING_METHOD];
-        
-        // If it's COD, update the word limit
-        if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
-          systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+        // Determine which prompt to use based on complexity and settings
+        if (shouldUseEnhancedPrompt) {
+          if (REASONING_METHOD === "cot") {
+            systemPrompt = ENHANCED_PROMPTS.cot;
+          } else if (REASONING_METHOD === "cod") {
+            // Use the appropriate CoD prompt based on word limit
+            if (COD_WORD_LIMIT === 5) {
+              systemPrompt = ENHANCED_PROMPTS.cod5;
+            } else if (COD_WORD_LIMIT === 10) {
+              systemPrompt = ENHANCED_PROMPTS.cod10;
+            } else if (COD_WORD_LIMIT === 15) {
+              systemPrompt = ENHANCED_PROMPTS.cod15;
+            } else if (COD_WORD_LIMIT === 17) {
+              systemPrompt = ENHANCED_PROMPTS.cod17;
+            } else if (COD_WORD_LIMIT === 20) {
+              systemPrompt = ENHANCED_PROMPTS.cod20;
+            } else {
+              // Fallback to standard prompt but update word limit
+              systemPrompt = PROMPTS[REASONING_METHOD].replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+            }
+          }
+        } else {
+          // Use the selected reasoning method prompt
+          systemPrompt = PROMPTS[REASONING_METHOD];
+          
+          // If it's COD, update the word limit
+          if (REASONING_METHOD === "cod" && COD_WORD_LIMIT !== 5) {
+            systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+          }
         }
         
         // If word count limit was requested, modify the prompt to clarify it applies to final answer only
@@ -1929,7 +2340,17 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           }
         }
         
-        console.log(`Using ${REASONING_METHOD.toUpperCase()} prompt ${REASONING_METHOD === "cod" ? "with word limit " + COD_WORD_LIMIT : ""}`);
+        let reasoningInfo = `${REASONING_METHOD.toUpperCase()}`;
+        if (REASONING_METHOD === "cod") {
+          reasoningInfo += `-${COD_WORD_LIMIT}`;
+        }
+        
+        if (shouldUseEnhancedPrompt) {
+          reasoningInfo += " (Enhanced for complex problem)";
+        }
+        
+        console.log(`Using ${reasoningInfo} prompt`);
+        
         if (wordCountRequest) {
           console.log(`Added instruction for ${wordCountRequest} word limit on final answer only`);
         }
@@ -1968,6 +2389,11 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
      * Message Sending
      ***********************/
     async function sendMessage(message) {
+      // NEW: Analyze problem complexity if enhanced reasoning is enabled
+      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
+        analyzeProblemComplexity(message);
+      }
+      
       addMessageToCurrentThread(message, "user");
 
       if (!MODEL_NAME) {
@@ -2034,6 +2460,13 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           let reasoningInfo = REASONING_METHOD.toUpperCase();
           if (REASONING_METHOD === "cod") {
             reasoningInfo += `-${COD_WORD_LIMIT}`;
+          }
+          
+          // Add enhanced reasoning info if used
+          if (ENHANCED_REASONING_ENABLED && 
+              REASONING_ENHANCEMENT === "adaptive" && 
+              PROBLEM_COMPLEXITY.complexity === "complex") {
+            reasoningInfo += "-ENHANCED";
           }
           
           // Process bot message to separate thinking and answer parts
@@ -2272,6 +2705,14 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             <span class="cod-word-limit-value">15 words</span>
             <span class="cod-word-limit-desc">More descriptive steps</span>
           </div>
+          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 17 ? 'selected' : ''}" data-value="17">
+            <span class="cod-word-limit-value">17 words</span>
+            <span class="cod-word-limit-desc">Better for complex reasoning</span>
+          </div>
+          <div class="cod-word-limit-option ${COD_WORD_LIMIT === 20 ? 'selected' : ''}" data-value="20">
+            <span class="cod-word-limit-value">20 words</span>
+            <span class="cod-word-limit-desc">Detailed steps for math & logic</span>
+          </div>
         </div>
         
         <div class="cod-examples">
@@ -2319,6 +2760,59 @@ Separate your steps with periods. Write your final answer after the #### separat
       }
       
       console.log(`Updated CoD prompt with word limit: ${COD_WORD_LIMIT}`);
+    }
+    
+    // Setup Enhanced Reasoning options
+    function setupEnhancedReasoningOptions() {
+      const enhancedToggle = document.getElementById('enhancedReasoningToggle');
+      const optionsContainer = document.getElementById('enhancedReasoningOptions');
+      const adaptiveRadio = document.getElementById('adaptiveReasoning');
+      const standardRadio = document.getElementById('standardReasoning');
+      
+      // Initialize state
+      if (enhancedToggle) {
+        enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
+        if (optionsContainer) {
+          optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
+        }
+      }
+      
+      if (adaptiveRadio && standardRadio) {
+        if (REASONING_ENHANCEMENT === 'adaptive') {
+          adaptiveRadio.checked = true;
+        } else {
+          standardRadio.checked = true;
+        }
+      }
+      
+      // Add event listeners
+      if (enhancedToggle) {
+        enhancedToggle.addEventListener('change', () => {
+          ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
+          if (optionsContainer) {
+            optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
+          }
+          updateCurrentModelDisplay();
+        });
+      }
+      
+      if (adaptiveRadio) {
+        adaptiveRadio.addEventListener('change', () => {
+          if (adaptiveRadio.checked) {
+            REASONING_ENHANCEMENT = 'adaptive';
+            updateCurrentModelDisplay();
+          }
+        });
+      }
+      
+      if (standardRadio) {
+        standardRadio.addEventListener('change', () => {
+          if (standardRadio.checked) {
+            REASONING_ENHANCEMENT = 'standard';
+            updateCurrentModelDisplay();
+          }
+        });
+      }
     }
     
     // Setup COD options display
@@ -2372,6 +2866,26 @@ Separate your steps with periods. Write your final answer after the #### separat
         const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
         if (reasoningRadio) reasoningRadio.checked = true;
         
+        // Set enhanced reasoning options
+        const enhancedToggle = document.getElementById('enhancedReasoningToggle');
+        if (enhancedToggle) enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
+        
+        const enhancedOptionsContainer = document.getElementById('enhancedReasoningOptions');
+        if (enhancedOptionsContainer) {
+          enhancedOptionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
+        }
+        
+        const adaptiveRadio = document.getElementById('adaptiveReasoning');
+        const standardRadio = document.getElementById('standardReasoning');
+        
+        if (adaptiveRadio && standardRadio) {
+          if (REASONING_ENHANCEMENT === 'adaptive') {
+            adaptiveRadio.checked = true;
+          } else {
+            standardRadio.checked = true;
+          }
+        }
+        
         // Set parameter sliders
         setSliderAndValue("temp", TEMPERATURE);
         setSliderAndValue("topP", TOP_P);
@@ -2409,6 +2923,8 @@ Separate your steps with periods. Write your final answer after the #### separat
         // Save previous settings for comparison
         const prevMethod = REASONING_METHOD;
         const prevWordLimit = COD_WORD_LIMIT;
+        const prevEnhanced = ENHANCED_REASONING_ENABLED;
+        const prevEnhancementType = REASONING_ENHANCEMENT;
         
         // Save model name
         const modelNameEl = document.getElementById("modelName");
@@ -2435,6 +2951,23 @@ Separate your steps with periods. Write your final answer after the #### separat
           }
         }
         
+        // Save enhanced reasoning settings
+        const enhancedToggle = document.getElementById('enhancedReasoningToggle');
+        if (enhancedToggle) {
+          ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
+        }
+        
+        const adaptiveRadio = document.getElementById('adaptiveReasoning');
+        const standardRadio = document.getElementById('standardReasoning');
+        
+        if (adaptiveRadio && standardRadio) {
+          if (adaptiveRadio.checked) {
+            REASONING_ENHANCEMENT = 'adaptive';
+          } else if (standardRadio.checked) {
+            REASONING_ENHANCEMENT = 'standard';
+          }
+        }
+        
         // Save generation parameters safely
         const getNumericValue = (id, defaultVal, parseFunc) => {
           const el = document.getElementById(id);
@@ -2456,6 +2989,8 @@ Separate your steps with periods. Write your final answer after the #### separat
           localStorage.setItem("modelName", MODEL_NAME);
           localStorage.setItem("reasoningMethod", REASONING_METHOD);
           localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
+          localStorage.setItem("enhancedReasoningEnabled", ENHANCED_REASONING_ENABLED.toString());
+          localStorage.setItem("reasoningEnhancement", REASONING_ENHANCEMENT);
           localStorage.setItem("temperature", TEMPERATURE.toString());
           localStorage.setItem("topP", TOP_P.toString());
           localStorage.setItem("topK", TOP_K.toString());
@@ -2465,6 +3000,7 @@ Separate your steps with periods. Write your final answer after the #### separat
           
           // Save custom prompts
           localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
+          localStorage.setItem("enhancedPrompts", JSON.stringify(ENHANCED_PROMPTS));
           console.log("Settings saved to localStorage");
         } catch (storageErr) {
           console.error("Error saving to localStorage:", storageErr);
@@ -2474,7 +3010,9 @@ Separate your steps with periods. Write your final answer after the #### separat
         
         // Check if reasoning method or COD word limit changed and notify user
         if (prevMethod !== REASONING_METHOD || 
-            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT)) {
+            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT) ||
+            prevEnhanced !== ENHANCED_REASONING_ENABLED ||
+            prevEnhancementType !== REASONING_ENHANCEMENT) {
           showNotification("Settings saved - reasoning method changed. Next message will use new settings.");
         } else {
           showNotification("Settings saved");
@@ -2551,6 +3089,7 @@ Separate your steps with periods. Write your final answer after the #### separat
             setupTabNavigation();
             setupModelInput();
             setupCODOptions();
+            setupEnhancedReasoningOptions();
             setupSliders();
             console.log("UI functionality setup complete");
           } catch (err) {
@@ -2575,12 +3114,31 @@ Separate your steps with periods. Write your final answer after the #### separat
         const codWordLimit = localStorage.getItem("codWordLimit");
         if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
         
+        // Load enhanced reasoning settings
+        const enhancedEnabled = localStorage.getItem("enhancedReasoningEnabled");
+        if (enhancedEnabled !== null) {
+          ENHANCED_REASONING_ENABLED = enhancedEnabled === "true";
+        }
+        
+        const enhancementType = localStorage.getItem("reasoningEnhancement");
+        if (enhancementType) {
+          REASONING_ENHANCEMENT = enhancementType;
+        }
+        
         // Load custom prompts if available
         const storedPrompts = localStorage.getItem("customPrompts");
         if (storedPrompts) {
           const parsedPrompts = JSON.parse(storedPrompts);
           // Merge with default prompts to ensure all properties exist
           PROMPTS = { ...PROMPTS, ...parsedPrompts };
+        }
+        
+        // Load enhanced prompts if available
+        const storedEnhancedPrompts = localStorage.getItem("enhancedPrompts");
+        if (storedEnhancedPrompts) {
+          const parsedEnhancedPrompts = JSON.parse(storedEnhancedPrompts);
+          // Merge with default prompts to ensure all properties exist
+          ENHANCED_PROMPTS = { ...ENHANCED_PROMPTS, ...parsedEnhancedPrompts };
         }
         
         const temp = localStorage.getItem("temperature");
@@ -2692,3 +3250,5 @@ Separate your steps with periods. Write your final answer after the #### separat
     <input type="radio" name="rating" value="5">
     <textarea name="comments"></textarea>
   </form>
+</body>
+</html>
