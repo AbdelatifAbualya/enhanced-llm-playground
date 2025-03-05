@@ -800,6 +800,28 @@
     .cod-example-answer {
       color: #4a8cff;
     }
+    
+    /* Word count breakdown */
+    .word-count-breakdown {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 3px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .count-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .count-thinking {
+      color: #b7c9db;
+    }
+
+    .count-answer {
+      color: #90cdf4;
+    }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
@@ -1243,6 +1265,39 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
     }
 
     /***********************
+     * Parse User Message for Word Count Requirements
+     ***********************/
+    function parseWordCountRequest(message) {
+      // Common patterns for word count requests
+      const patterns = [
+        /(\d+)\s*words?/i, // Matches: "50 words", "100 word", etc.
+        /in\s*(\d+)\s*words/i, // Matches: "in 50 words", "in 100 words"
+        /limit\s*(\d+)\s*words/i, // Matches: "limit 50 words", "limit to 100 words"
+        /answer\s*in\s*(\d+)\s*words/i, // Matches: "answer in 50 words"
+        /respond\s*in\s*(\d+)\s*words/i, // Matches: "respond in 50 words"
+        /keep\s*it\s*to\s*(\d+)\s*words/i, // Matches: "keep it to 50 words"
+        /no\s*more\s*than\s*(\d+)\s*words/i, // Matches: "no more than 50 words"
+        /under\s*(\d+)\s*words/i, // Matches: "under 50 words"
+        /maximum\s*of\s*(\d+)\s*words/i, // Matches: "maximum of 50 words"
+        /max\s*(\d+)\s*words/i // Matches: "max 50 words"
+      ];
+
+      // Check each pattern
+      for (const pattern of patterns) {
+        const match = message.match(pattern);
+        if (match && match[1]) {
+          const wordCount = parseInt(match[1]);
+          if (!isNaN(wordCount) && wordCount > 0) {
+            return wordCount;
+          }
+        }
+      }
+
+      // No word count requirement found
+      return null;
+    }
+
+    /***********************
      * Download as TXT
      ***********************/
     function downloadCurrentThreadAsTxt() {
@@ -1261,7 +1316,11 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         // Add word count info for bot messages
         let headerInfo = prefix;
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          headerInfo += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          let countInfo = `[${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
+            countInfo += ` (thinking: ${msg.thinkingWordCount}, answer: ${msg.answerWordCount})`;
+          }
+          headerInfo += ` ${countInfo}`;
         }
         
         content += `${headerInfo}:\n`;
@@ -1344,7 +1403,11 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         // Add word count info for bot messages
         let sender = msg.sender.toUpperCase() + ":";
         if (msg.sender === "bot" && !msg.isPlaceholder && msg.wordCount !== undefined) {
-          sender += ` [${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          let countInfo = `[${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}]`;
+          if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
+            countInfo += ` (thinking: ${msg.thinkingWordCount}, answer: ${msg.answerWordCount})`;
+          }
+          sender += ` ${countInfo}`;
         }
         
         doc.text(sender, leftMargin, yPos);
@@ -1465,7 +1528,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           return {
             content: content,
             thinking: thinking,
-            answer: answer
+            answer: answer,
+            thinkingWordCount: countWords(thinking),
+            answerWordCount: countWords(answer)
           };
         } else {
           // Try to identify thinking steps and final answer based on structure
@@ -1485,7 +1550,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             return {
               content: content,
               thinking: thinking,
-              answer: lastPart
+              answer: lastPart,
+              thinkingWordCount: countWords(thinking),
+              answerWordCount: countWords(lastPart)
             };
           }
         }
@@ -1518,7 +1585,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             return {
               content: content,
               thinking: thinking,
-              answer: answer
+              answer: answer,
+              thinkingWordCount: countWords(thinking),
+              answerWordCount: countWords(answer)
             };
           }
         }
@@ -1546,7 +1615,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           return {
             content: content,
             thinking: thinking,
-            answer: answer
+            answer: answer,
+            thinkingWordCount: countWords(thinking),
+            answerWordCount: countWords(answer)
           };
         }
         
@@ -1560,7 +1631,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             return {
               content: content,
               thinking: thinking,
-              answer: lastParagraph
+              answer: lastParagraph,
+              thinkingWordCount: countWords(thinking),
+              answerWordCount: countWords(lastParagraph)
             };
           }
         }
@@ -1571,7 +1644,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         return {
           content: content,
           thinking: null, 
-          answer: content
+          answer: content,
+          thinkingWordCount: 0,
+          answerWordCount: countWords(content)
         };
       }
       
@@ -1579,7 +1654,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
       return {
         content: content,
         thinking: reasoningMethod === "cot" || reasoningMethod === "cod" ? content : null,
-        answer: reasoningMethod === "standard" ? content : null
+        answer: reasoningMethod === "standard" ? content : null,
+        thinkingWordCount: reasoningMethod === "cot" || reasoningMethod === "cod" ? countWords(content) : 0,
+        answerWordCount: reasoningMethod === "standard" ? countWords(content) : 0
       };
     }
 
@@ -1729,6 +1806,18 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             // Calculate token savings if we have CoD
             let badgeText = `${msg.wordCount} words - ${msg.reasoningMethod || REASONING_METHOD.toUpperCase()}`;
             
+            wordCountBadge.innerHTML = badgeText;
+            
+            // Add breakdown of thinking vs answer word counts
+            if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
+              wordCountBadge.innerHTML += `
+                <div class="word-count-breakdown">
+                  <span class="count-item count-thinking">thinking: ${msg.thinkingWordCount}</span>
+                  <span class="count-item count-answer">answer: ${msg.answerWordCount}</span>
+                </div>
+              `;
+            }
+            
             // If this is a CoD message, add token savings estimate
             if (msg.reasoningMethod && msg.reasoningMethod.startsWith("COD") && thread.messages.length > 1) {
               // Find a similar CoT message (if available) to compare token savings
@@ -1745,12 +1834,14 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
                 const savings = Math.round(100 - ((msg.wordCount / avgCotWords) * 100));
                 
                 if (savings > 0) {
-                  badgeText += ` (${savings}% fewer words)`;
+                  const savingsEl = document.createElement("div");
+                  savingsEl.className = "token-savings";
+                  savingsEl.textContent = `${savings}% fewer words than CoT`;
+                  wordCountBadge.appendChild(savingsEl);
                 }
               }
             }
             
-            wordCountBadge.textContent = badgeText;
             messageDiv.appendChild(wordCountBadge);
           }
 
@@ -1767,11 +1858,17 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         // Process bot messages to separate thinking from answer
         let thinking = null;
         let answer = null;
+        let thinkingWordCount = 0;
+        let answerWordCount = 0;
+        let totalWordCount = 0;
         
         if (sender === "bot" && !isPlaceholder) {
           const processed = processBotMessage(content, REASONING_METHOD);
           thinking = processed.thinking;
           answer = processed.answer;
+          thinkingWordCount = processed.thinkingWordCount || 0;
+          answerWordCount = processed.answerWordCount || 0;
+          totalWordCount = thinkingWordCount + answerWordCount;
         }
         
         thread.messages.push({
@@ -1779,12 +1876,14 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           sender,
           isPlaceholder,
           timestamp: new Date(),
-          wordCount: sender === "bot" && !isPlaceholder ? countWords(content) : undefined,
+          wordCount: sender === "bot" && !isPlaceholder ? totalWordCount : undefined,
           reasoningMethod: sender === "bot" && !isPlaceholder ? 
             (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
             undefined,
           thinking,
-          answer
+          answer,
+          thinkingWordCount: sender === "bot" && !isPlaceholder ? thinkingWordCount : undefined,
+          answerWordCount: sender === "bot" && !isPlaceholder ? answerWordCount : undefined
         });
         renderCurrentThreadMessages();
       }
@@ -1793,7 +1892,7 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
     /***********************
      * Build Messages Array for Chat Completions
      ***********************/
-    function buildMessagesForChat() {
+    function buildMessagesForChat(wordCountRequest = null) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (!thread) return [];
       
@@ -1811,7 +1910,29 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
         }
         
+        // If word count limit was requested, modify the prompt to clarify it applies to final answer only
+        if (wordCountRequest && wordCountRequest > 0) {
+          if (REASONING_METHOD === "cod") {
+            // For CoD, add the instruction right before the examples section
+            const examplesIndex = systemPrompt.indexOf("Examples:");
+            if (examplesIndex !== -1) {
+              const beforeExamples = systemPrompt.substring(0, examplesIndex);
+              const afterExamples = systemPrompt.substring(examplesIndex);
+              
+              systemPrompt = `${beforeExamples}\nIMPORTANT: Your final answer after the #### separator should be ${wordCountRequest} words maximum. The word limit applies ONLY to your final answer, not your thinking steps.\n\n${afterExamples}`;
+            } else {
+              systemPrompt += `\n\nIMPORTANT: Your final answer after the #### separator should be ${wordCountRequest} words maximum. The word limit applies ONLY to your final answer, not your thinking steps.`;
+            }
+          } else if (REASONING_METHOD === "cot") {
+            // For CoT, add to the end of the prompt
+            systemPrompt += `\n\nIMPORTANT: Your final answer should be ${wordCountRequest} words maximum. This word limit applies ONLY to your final answer, not your thinking process.`;
+          }
+        }
+        
         console.log(`Using ${REASONING_METHOD.toUpperCase()} prompt ${REASONING_METHOD === "cod" ? "with word limit " + COD_WORD_LIMIT : ""}`);
+        if (wordCountRequest) {
+          console.log(`Added instruction for ${wordCountRequest} word limit on final answer only`);
+        }
         
         messages.push({
           role: "system",
@@ -1819,6 +1940,15 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         });
       } else {
         console.log("Using standard reasoning (no special prompt)");
+        
+        // If word count limit was requested, add a system message for it
+        if (wordCountRequest && wordCountRequest > 0) {
+          messages.push({
+            role: "system",
+            content: `Please limit your response to ${wordCountRequest} words maximum.`
+          });
+          console.log(`Added instruction for ${wordCountRequest} word limit`);
+        }
       }
       
       // Add all user and assistant messages
@@ -1847,12 +1977,15 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
         return;
       }
 
+      // Parse message for word count requirements
+      const wordCountRequest = parseWordCountRequest(message);
+      
       addMessageToCurrentThread("Bot is typing...", "bot", true);
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
 
-      // Build messages array with current settings
-      const messagesForApi = buildMessagesForChat();
+      // Build messages array with current settings and word count request
+      const messagesForApi = buildMessagesForChat(wordCountRequest);
 
       // Create payload
       const payload = {
@@ -1867,6 +2000,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
       };
       
       console.log(`Sending request with ${REASONING_METHOD} reasoning ${REASONING_METHOD === "cod" ? `(word limit: ${COD_WORD_LIMIT})` : ""}`);
+      if (wordCountRequest) {
+        console.log(`Final answer word limit requested: ${wordCountRequest} words`);
+      }
       console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
 
       try {
@@ -1893,7 +2029,6 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
                          data.choices[0].message.content;
         if (botReply) {
           const trimmedReply = botReply.trim();
-          const wordCount = countWords(trimmedReply);
           
           // Create response metadata
           let reasoningInfo = REASONING_METHOD.toUpperCase();
@@ -1909,10 +2044,12 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             sender: "bot",
             isPlaceholder: false,
             timestamp: new Date(),
-            wordCount: wordCount,
+            wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0),
             reasoningMethod: reasoningInfo,
             thinking: processed.thinking,
-            answer: processed.answer
+            answer: processed.answer,
+            thinkingWordCount: processed.thinkingWordCount || 0,
+            answerWordCount: processed.answerWordCount || 0
           };
         } else {
           thread.messages[placeholderIndex] = {
@@ -1923,7 +2060,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
             wordCount: 0,
             reasoningMethod: REASONING_METHOD.toUpperCase(),
             thinking: null,
-            answer: null
+            answer: null,
+            thinkingWordCount: 0,
+            answerWordCount: 0
           };
         }
       } catch (error) {
@@ -1945,7 +2084,9 @@ A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
           wordCount: 0,
           reasoningMethod: REASONING_METHOD.toUpperCase(),
           thinking: null,
-          answer: null
+          answer: null,
+          thinkingWordCount: 0,
+          answerWordCount: 0
         };
       }
       renderCurrentThreadMessages();
@@ -2551,5 +2692,3 @@ Separate your steps with periods. Write your final answer after the #### separat
     <input type="radio" name="rating" value="5">
     <textarea name="comments"></textarea>
   </form>
-</body>
-</html>
