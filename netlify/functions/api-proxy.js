@@ -1,7 +1,25 @@
 // Netlify Function to securely proxy requests to Fireworks.ai
 exports.handler = async function(event, context) {
+  // Set the function timeout to 120 seconds (2 minutes)
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   // Load fetch at runtime
   const fetch = require('node-fetch');
+  
+  // Configure fetch timeout to 110 seconds (just under the function's 2-minute limit)
+  // This uses node-fetch v2 timeout mechanism
+  const fetchWithTimeout = async (url, options, timeout = 110000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      options.signal = controller.signal;
+      const response = await fetch(url, options);
+      return response;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
   
   // Handle OPTIONS request for CORS
   if (event.httpMethod === 'OPTIONS') {
@@ -66,15 +84,15 @@ exports.handler = async function(event, context) {
       console.log(`Using reasoning method: ${reasoningMethod}`);
       const startTime = Date.now();
       
-      // Forward the request to Fireworks.ai
-      const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
+      // Forward the request to Fireworks.ai with timeout
+      const response = await fetchWithTimeout('https://api.fireworks.ai/inference/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify(requestBody)
-      });
+      }, 110000); // 110 seconds timeout
 
       const endTime = Date.now();
       const responseTime = endTime - startTime;
@@ -102,6 +120,22 @@ exports.handler = async function(event, context) {
         }
       };
     } catch (parseError) {
+      // Check if this is an abort error (timeout)
+      if (parseError.name === 'AbortError') {
+        console.error("Request timed out after 110 seconds");
+        return {
+          statusCode: 504,
+          body: JSON.stringify({ 
+            error: 'Gateway Timeout', 
+            message: 'The request to the LLM API took too long to complete (>110 seconds)'
+          }),
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        };
+      }
+      
       console.error("Error parsing request:", parseError);
       return {
         statusCode: 400,
