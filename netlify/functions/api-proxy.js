@@ -7,7 +7,7 @@ exports.handler = async function(event, context) {
   const fetch = require('node-fetch');
   
   // Configure fetch timeout to 120 seconds (Netlify's maximum)
-  const fetchWithTimeout = async (url, options, timeout = 120000) => {
+  const fetchWithTimeout = async (url, options, timeout = 150000) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       console.log("Request is taking too long, aborting...");
