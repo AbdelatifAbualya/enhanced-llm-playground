@@ -2276,43 +2276,160 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       addCodeCopyButtons();
     }
 
-    function addMessageToCurrentThread(content, sender, isPlaceholder = false) {
-      const thread = threads.find(t => t.id === currentThreadId);
-      if (thread) {
-        // Process bot messages to separate thinking from answer
-        let thinking = null;
-        let answer = null;
-        let thinkingWordCount = 0;
-        let answerWordCount = 0;
-        let totalWordCount = 0;
-        
-        if (sender === "bot" && !isPlaceholder) {
-          const processed = processBotMessage(content, REASONING_METHOD);
-          thinking = processed.thinking;
-          answer = processed.answer;
-          thinkingWordCount = processed.thinkingWordCount || 0;
-          answerWordCount = processed.answerWordCount || 0;
-          totalWordCount = thinkingWordCount + answerWordCount;
-        }
-        
-        thread.messages.push({
-          content,
-          sender,
-          isPlaceholder,
-          timestamp: new Date(),
-          wordCount: sender === "bot" && !isPlaceholder ? totalWordCount : undefined,
-          reasoningMethod: sender === "bot" && !isPlaceholder ? 
-            (REASONING_METHOD === "cod" ? `${REASONING_METHOD.toUpperCase()}-${COD_WORD_LIMIT}` : REASONING_METHOD.toUpperCase()) : 
-            undefined,
-          thinking,
-          answer,
-          thinkingWordCount: sender === "bot" && !isPlaceholder ? thinkingWordCount : undefined,
-          answerWordCount: sender === "bot" && !isPlaceholder ? answerWordCount : undefined,
-          // NEW: Add complexity info for debugging
-          complexityInfo: sender === "user" ? PROBLEM_COMPLEXITY : undefined
-        });
-        renderCurrentThreadMessages();
+async function sendMessage(message) {
+  // NEW: Analyze problem complexity if enhanced reasoning is enabled
+  if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
+    analyzeProblemComplexity(message);
+  }
+  
+  addMessageToCurrentThread(message, "user");
+
+  if (!MODEL_NAME) {
+    const errorMsg = "Error: Please set the Model Name in the Settings.";
+    addMessageToCurrentThread(errorMsg, "bot");
+    console.error(errorMsg);
+    return;
+  }
+
+  // Parse message for word count requirements
+  const wordCountRequest = parseWordCountRequest(message);
+  
+  addMessageToCurrentThread("Bot is typing...", "bot", true);
+  const thread = threads.find(t => t.id === currentThreadId);
+  const placeholderIndex = thread.messages.length - 1;
+
+  // Build messages array with current settings and word count request
+  const messagesForApi = buildMessagesForChat(wordCountRequest);
+
+  // Create payload
+  const payload = {
+    model: MODEL_NAME,
+    max_tokens: MAX_TOKENS,
+    top_p: TOP_P,
+    top_k: TOP_K,
+    presence_penalty: PRESENCE_PENALTY,
+    frequency_penalty: FREQUENCY_PENALTY,
+    temperature: TEMPERATURE,
+    messages: messagesForApi
+  };
+  
+  console.log(`Sending request with ${REASONING_METHOD} reasoning ${REASONING_METHOD === "cod" ? `(word limit: ${COD_WORD_LIMIT})` : ""}`);
+  if (wordCountRequest) {
+    console.log(`Final answer word limit requested: ${wordCountRequest} words`);
+  }
+  console.log(`Parameters: temp=${TEMPERATURE}, top_p=${TOP_P}, top_k=${TOP_K}`);
+
+  try {
+    // Add timestamp to URL to prevent caching
+    const timestamp = new Date().getTime();
+    const cacheBuster = `?t=${timestamp}`;
+    
+    // Set a longer timeout for fetch requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 130000); // 130 seconds timeout (slightly longer than server)
+    
+    const response = await fetch(`${API_PROXY_URL}${cacheBuster}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || errorData.error || 'Unknown error'}`);
+    }
+    
+    const data = await response.json();
+    const botReply = data.choices &&
+                     data.choices[0] &&
+                     data.choices[0].message &&
+                     data.choices[0].message.content;
+    if (botReply) {
+      const trimmedReply = botReply.trim();
+      
+      // Create response metadata
+      let reasoningInfo = REASONING_METHOD.toUpperCase();
+      if (REASONING_METHOD === "cod") {
+        reasoningInfo += `-${COD_WORD_LIMIT}`;
       }
+      
+      // Add enhanced reasoning info if used
+      if (ENHANCED_REASONING_ENABLED && 
+          REASONING_ENHANCEMENT === "adaptive" && 
+          PROBLEM_COMPLEXITY.complexity === "complex") {
+        reasoningInfo += "-ENHANCED";
+      }
+      
+      // Process bot message to separate thinking and answer parts
+      const processed = processBotMessage(trimmedReply, REASONING_METHOD);
+      
+      thread.messages[placeholderIndex] = {
+        content: trimmedReply,
+        sender: "bot",
+        isPlaceholder: false,
+        timestamp: new Date(),
+        wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0),
+        reasoningMethod: reasoningInfo,
+        thinking: processed.thinking,
+        answer: processed.answer,
+        thinkingWordCount: processed.thinkingWordCount || 0,
+        answerWordCount: processed.answerWordCount || 0
+      };
+    } else {
+      thread.messages[placeholderIndex] = {
+        content: "No valid response received. Check model name and API key.",
+        sender: "bot",
+        isPlaceholder: false,
+        timestamp: new Date(),
+        wordCount: 0,
+        reasoningMethod: REASONING_METHOD.toUpperCase(),
+        thinking: null,
+        answer: null,
+        thinkingWordCount: 0,
+        answerWordCount: 0
+      };
+    }
+  } catch (error) {
+    console.error("Error communicating with API:", error);
+    
+    // Provide more detailed error message
+    let errorMessage = "Error communicating with API: " + error.message;
+    
+    // Special handling for timeout errors
+    if (error.name === 'AbortError') {
+      errorMessage = "Request timed out. The model is taking too long to respond. Try:\n";
+      errorMessage += "1. Using a simpler prompt\n";
+      errorMessage += "2. Reducing the max tokens setting\n";
+      errorMessage += "3. Using a different reasoning method or model";
+    } else if (error.message.includes("504") || error.message.includes("Gateway Timeout")) {
+      errorMessage = "Request timed out on the server. Try:\n";
+      errorMessage += "1. Reducing your prompt complexity\n";
+      errorMessage += "2. Using fewer tokens (in Settings > Parameters)\n";
+      errorMessage += "3. Trying a faster model or different reasoning method";
+    } else if (error.message.includes("Failed to fetch")) {
+      errorMessage += "\n\nPossible solutions:\n1. Make sure your API key is set correctly in Netlify\n2. Check that your model name is valid\n3. Verify your internet connection";
+    }
+    
+    thread.messages[placeholderIndex] = {
+      content: errorMessage,
+      sender: "bot",
+      isPlaceholder: false,
+      timestamp: new Date(),
+      wordCount: 0,
+      reasoningMethod: REASONING_METHOD.toUpperCase(),
+      thinking: null,
+      answer: null,
+      thinkingWordCount: 0,
+      answerWordCount: 0
+    };
+  }
+  renderCurrentThreadMessages();
+}
     }
 
     /***********************
