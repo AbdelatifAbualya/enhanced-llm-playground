@@ -6,11 +6,13 @@ exports.handler = async function(event, context) {
   // Load fetch at runtime
   const fetch = require('node-fetch');
   
-  // Configure fetch timeout to 110 seconds (just under the function's 2-minute limit)
-  // This uses node-fetch v2 timeout mechanism
-  const fetchWithTimeout = async (url, options, timeout = 110000) => {
+  // Configure fetch timeout to 120 seconds (Netlify's maximum)
+  const fetchWithTimeout = async (url, options, timeout = 120000) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const timeoutId = setTimeout(() => {
+      console.log("Request is taking too long, aborting...");
+      controller.abort();
+    }, timeout);
     
     try {
       options.signal = controller.signal;
@@ -69,22 +71,30 @@ exports.handler = async function(event, context) {
     try {
       // Parse the request body
       const requestBody = JSON.parse(event.body);
-      console.log(`Model requested: ${requestBody.model || 'not specified'}`);
+      const modelName = requestBody.model || 'not specified';
+      console.log(`Model requested: ${modelName}`);
       
       // Add timing metrics for monitoring CoD vs CoT performance
-      const reasoningMethod = requestBody.messages && 
-                             requestBody.messages[0] && 
-                             requestBody.messages[0].content &&
-                             requestBody.messages[0].content.includes('Chain of Draft') ? 'CoD' : 
-                             (requestBody.messages && 
-                             requestBody.messages[0] && 
-                             requestBody.messages[0].content &&
-                             requestBody.messages[0].content.includes('Chain of Thought') ? 'CoT' : 'Standard');
+      let reasoningMethod = 'Standard';
+      if (requestBody.messages && requestBody.messages[0] && requestBody.messages[0].content) {
+        const systemPrompt = requestBody.messages[0].content;
+        if (systemPrompt.includes('Chain of Draft')) {
+          reasoningMethod = 'CoD';
+        } else if (systemPrompt.includes('Chain of Thought')) {
+          reasoningMethod = 'CoT';
+        }
+      }
       
       console.log(`Using reasoning method: ${reasoningMethod}`);
+      console.log(`Request complexity: ${JSON.stringify({
+        messages_count: requestBody.messages ? requestBody.messages.length : 0,
+        max_tokens: requestBody.max_tokens || 'default'
+      })}`);
+      
       const startTime = Date.now();
       
       // Forward the request to Fireworks.ai with timeout
+      // Increased timeout to maximum allowed by Netlify (120 seconds)
       const response = await fetchWithTimeout('https://api.fireworks.ai/inference/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -92,11 +102,28 @@ exports.handler = async function(event, context) {
           'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify(requestBody)
-      }, 110000); // 110 seconds timeout
+      }, 120000); // 120 seconds timeout
 
       const endTime = Date.now();
       const responseTime = endTime - startTime;
       console.log(`Fireworks API response status: ${response.status}, time: ${responseTime}ms, method: ${reasoningMethod}`);
+      
+      // Check if response is ok
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API error (${response.status}): ${errorText}`);
+        return {
+          statusCode: response.status,
+          body: JSON.stringify({ 
+            error: `API Error: ${response.statusText}`, 
+            details: errorText
+          }),
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        };
+      }
       
       // Get the response data
       const data = await response.json();
@@ -111,7 +138,7 @@ exports.handler = async function(event, context) {
       
       // Return the response from Fireworks.ai
       return {
-        statusCode: response.status,
+        statusCode: 200,
         body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json',
@@ -122,12 +149,12 @@ exports.handler = async function(event, context) {
     } catch (parseError) {
       // Check if this is an abort error (timeout)
       if (parseError.name === 'AbortError') {
-        console.error("Request timed out after 110 seconds");
+        console.error("Request timed out after 120 seconds");
         return {
           statusCode: 504,
           body: JSON.stringify({ 
             error: 'Gateway Timeout', 
-            message: 'The request to the LLM API took too long to complete (>110 seconds)'
+            message: 'The request to the LLM API took too long to complete (>120 seconds). Try reducing complexity or using fewer tokens.'
           }),
           headers: { 
             'Content-Type': 'application/json',
@@ -136,12 +163,12 @@ exports.handler = async function(event, context) {
         };
       }
       
-      console.error("Error parsing request:", parseError);
+      console.error("Error processing request:", parseError);
       return {
         statusCode: 400,
         body: JSON.stringify({ 
           error: 'Bad Request', 
-          message: 'Invalid request body'
+          message: 'Error processing request: ' + parseError.message
         }),
         headers: { 
           'Content-Type': 'application/json',
@@ -150,7 +177,7 @@ exports.handler = async function(event, context) {
       };
     }
   } catch (error) {
-    console.error('Function error:', error.message);
+    console.error('Function error:', error.message, error.stack);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
