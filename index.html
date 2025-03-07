@@ -142,9 +142,9 @@
       padding: 1rem;
       box-shadow: 0 -2px 4px rgba(0,0,0,0.3);
     }
-    .chat-input textarea {
+     .chat-input textarea {
       flex: 1;
-      resize: none;
+      resize: vertical; /* Allow vertical resizing */
       border: none;
       background-color: #2e2e2e;
       color: #fff;
@@ -153,6 +153,8 @@
       font-size: 1rem;
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+      min-height: 100px; /* Set minimum height */
+      max-height: 300px; /* Set maximum height */
     }
     .chat-input button {
       margin-left: 1rem;
@@ -1123,7 +1125,7 @@
           </button>
           <input type="file" id="imageUpload" accept="image/*" style="display: none;">
         </div>
-        <textarea id="userInput" rows="2" placeholder="Type your message..."></textarea>
+        <textarea id="userInput" rows="5" placeholder="Type your message..."></textarea>
         <button id="sendBtn">Send</button>
       </div>
     </div>
