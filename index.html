@@ -60,6 +60,91 @@
     .sidebar li.active {
       background-color: #444;
     }
+      /* Enhanced Final Answer Styling */
+  .final-answer {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    color: #edf2f7;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.5;
+    position: relative;
+    clear: both;
+    overflow: hidden;
+  }
+
+  .final-answer-label {
+    font-size: 0.7rem;
+    color: #90cdf4;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    border-bottom: 1px dotted #5a7299;
+    padding-bottom: 5px;
+    display: block;
+  }
+
+  .message {
+    position: relative !important;
+    overflow: visible !important;
+    padding-bottom: 20px; /* Add space for word count badge */
+  }
+
+  .word-count-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(30, 30, 30, 0.9);
+    color: #ddd;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    z-index: 5;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Add this to ensure proper CoD styling */
+  .cod-thinking {
+    background-color: #1e293b !important;
+    border-color: #3d4e63 !important;
+    font-family: 'Roboto Mono', monospace !important;
+  }
+
+  /* Improved CoD step styling */
+  .cod-step {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 10px;
+    margin-bottom: 12px !important;
+    border-left: none !important;
+    background-color: #2c3b4f;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  /* Make thinking steps and final answer containers properly visible */
+  .thinking-steps, .final-answer {
+    width: 100% !important;
+    display: block !important;
+  }
+  
+  /* Improved word count breakdown display */
+  .word-count-breakdown {
+    font-size: 0.7rem;
+    color: #aaa;
+    margin-top: 3px;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+  }
     .sidebar button {
       width: 100%;
       margin-top: 0.5rem;
@@ -1794,6 +1879,18 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     /***********************
      * Parse User Message for Word Count Requirements
      ***********************/
+    function formatFinalAnswer(answer) {
+      if (!answer) return '';
+  
+    // Clean up the answer text
+      let formattedAnswer = answer.trim();
+  
+    // Remove any leading markers if they exist
+      formattedAnswer = formattedAnswer.replace(/^(Answer:|Final answer:|The answer is:|Therefore,|Thus,|Hence,)/i, '').trim();
+  
+    // Apply markup for better readability if needed
+      return formattedAnswer;
+    }  
     function parseWordCountRequest(message) {
       // Common patterns for word count requests
       const patterns = [
@@ -2304,7 +2401,8 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               answerDiv.appendChild(answerLabel);
               
               const answerContent = document.createElement("div");
-              answerContent.innerHTML = transformMessage(msg.answer);
+              // Use our new formatting function here
+              answerContent.innerHTML = transformMessage(formatFinalAnswer(msg.answer));
               answerDiv.appendChild(answerContent);
               
               messageContainer.appendChild(answerDiv);
@@ -2369,6 +2467,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               }
             }
             
+            // Append the badge to the message div directly
             messageDiv.appendChild(wordCountBadge);
           }
 
