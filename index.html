@@ -169,6 +169,85 @@
     .chat-input button:hover {
       background-color: #4a4a4a;
     }
+    /* Model Selection Styles */
+.model-select-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.model-dropdown {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 0.95rem;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  pointer-events: none;
+  font-size: 0.7rem;
+}
+
+.model-dropdown:hover {
+  border-color: #666;
+  background-color: #333;
+}
+
+.model-dropdown:focus {
+  border-color: #4a8cff;
+  box-shadow: 0 0 0 2px rgba(74, 140, 255, 0.25);
+}
+
+.model-info-card {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.model-info-header {
+  background-color: #333;
+  padding: 10px 15px;
+  font-weight: 500;
+  border-bottom: 1px solid #444;
+}
+
+.model-info-body {
+  padding: 15px;
+}
+
+.model-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.model-tag {
+  background-color: #3a4a5c;
+  color: #90cdf4;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.model-description {
+  color: #ddd;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
     /* --------------------------------
        Message Styles
     -------------------------------- */
@@ -1064,14 +1143,38 @@
       </div>
       
       <!-- Model Selection Tab -->
-      <div id="modelTab" class="tab-content active">
-        <div class="settings-section-header">Model Configuration</div>
-        <label for="modelName">Model Name/Path</label>
-        <input type="text" id="modelName" placeholder="Enter full model name/path from Fireworks.ai">
-        <p style="font-size: 0.8rem; color: #aaa; margin-top: 0; margin-bottom: 15px;">Enter the complete model identifier as used in Fireworks.ai API.</p>
-        
-        <button id="setModelBtn">Set Model</button>
+  <div id="modelTab" class="tab-content active">
+    <div class="settings-section-header">Model Selection</div>
+  
+    <label for="modelSelect">Select LLM Model</label>
+    <div class="model-select-container">
+        <select id="modelSelect" class="model-dropdown">
+        <option value="" disabled selected>Choose a model...</option>
+        <option value="accounts/fireworks/models/deepseek-v3">DeepSeek V3</option>
+        <option value="accounts/fireworks/models/mistral-small-24b-instruct-2501">Mistral 24B</option>
+        <option value="accounts/fireworks/models/llama-v3p3-70b-instruct">Llama 3.1 70B</option>
+        <option value="accounts/fireworks/models/qwen2p5-coder-32b-instruct">Qwen 2.5 Coder 32B</option>
+        <option value="accounts/fireworks/models/mixtral-8x22b-instruct">Mixtral 8x22B</option>
+    </select>
+    <div class="dropdown-arrow">▼</div>
+  </div>
+  
+  <div class="model-info-card" id="modelInfoCard">
+    <div class="model-info-header">
+      <span id="selectedModelName">No model selected</span>
+    </div>
+    <div class="model-info-body">
+      <div class="model-tags" id="modelTags">
+        <!-- Tags will be added dynamically -->
       </div>
+      <div class="model-description" id="modelDescription">
+        Select a model to see details
+      </div>
+    </div>
+  </div>
+  
+  <button id="setModelBtn">Set Model</button>
+</div>
       
       <!-- Reasoning Tab -->
       <div id="reasoningTab" class="tab-content">
@@ -2741,22 +2844,106 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     }
     
     // Custom model handling
-    function setupModelInput() {
-      const modelInput = document.getElementById('modelName');
-      const setModelBtn = document.getElementById('setModelBtn');
-      
-      setModelBtn.addEventListener('click', () => {
-        const modelName = modelInput.value.trim();
-        if (modelName) {
-          MODEL_NAME = modelName;
-          MODEL_NAME_DISPLAY = getModelDisplayName(modelName);
-          updateCurrentModelDisplay();
-          showNotification('Model set: ' + MODEL_NAME_DISPLAY);
-        } else {
-          showNotification('Please enter a valid model name');
-        }
-      });
+function setupModelInput() {
+  const modelSelect = document.getElementById('modelSelect');
+  const setModelBtn = document.getElementById('setModelBtn');
+  const modelInfoCard = document.getElementById('modelInfoCard');
+  const selectedModelName = document.getElementById('selectedModelName');
+  const modelTags = document.getElementById('modelTags');
+  const modelDescription = document.getElementById('modelDescription');
+  
+  // Model information database
+  const modelInfo = {
+    "accounts/fireworks/models/deepseek-v3": {
+      name: "DeepSeek V3",
+      tags: ["70B", "General Purpose", "Reasoning"],
+      description: "A powerful model with strong reasoning and problem solving capabilities. Good for complex tasks, versatile across different domains."
+    },
+    "accounts/fireworks/models/mistral-small-24b-instruct-2501": {
+      name: "Mistral 24B",
+      tags: ["24B", "Fast", "Well-balanced"],
+      description: "A fast and efficient model with good balance between performance and speed. Great for everyday tasks and conversations."
+    },
+    "accounts/fireworks/models/llama-v3p3-70b-instruct": {
+      name: "Llama 3.1 70B",
+      tags: ["70B", "High Performance", "Instruction Following"],
+      description: "Meta's flagship large language model. Excellent at following complex instructions with high accuracy and detailed outputs."
+    },
+    "accounts/fireworks/models/qwen2p5-coder-32b-instruct": {
+      name: "Qwen 2.5 Coder 32B",
+      tags: ["32B", "Coding", "Technical"],
+      description: "Specialized for coding tasks and technical problem solving. Strong at generating, explaining, and debugging code across many languages."
+    },
+    "accounts/fireworks/models/mixtral-8x22b-instruct": {
+      name: "Mixtral 8x22B",
+      tags: ["176B", "MoE", "High Capacity"],
+      description: "A Mixture of Experts model with massive capacity. Excellent for detailed, nuanced responses and specialized knowledge domains."
     }
+  };
+  
+  // Initialize with current model if set
+  if (MODEL_NAME && modelInfo[MODEL_NAME]) {
+    modelSelect.value = MODEL_NAME;
+    updateModelInfo(MODEL_NAME);
+  }
+  
+  // Update model info card when selection changes
+  modelSelect.addEventListener('change', () => {
+    const selectedModel = modelSelect.value;
+    updateModelInfo(selectedModel);
+  });
+  
+  function updateModelInfo(modelId) {
+    if (modelInfo[modelId]) {
+      const info = modelInfo[modelId];
+      
+      // Update header
+      selectedModelName.textContent = info.name;
+      
+      // Update tags
+      modelTags.innerHTML = '';
+      info.tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'model-tag';
+        tagElement.textContent = tag;
+        modelTags.appendChild(tagElement);
+      });
+      
+      // Update description
+      modelDescription.textContent = info.description;
+      
+      // Show the card with animation
+      modelInfoCard.style.display = 'block';
+      modelInfoCard.style.opacity = '0';
+      modelInfoCard.style.transform = 'translateY(10px)';
+      
+      // Animate in
+      setTimeout(() => {
+        modelInfoCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        modelInfoCard.style.opacity = '1';
+        modelInfoCard.style.transform = 'translateY(0)';
+      }, 10);
+    } else {
+      // Hide or reset the card if no valid model
+      selectedModelName.textContent = 'No model selected';
+      modelTags.innerHTML = '';
+      modelDescription.textContent = 'Select a model to see details';
+    }
+  }
+  
+  // Set model button
+  setModelBtn.addEventListener('click', () => {
+    const modelName = modelSelect.value;
+    if (modelName) {
+      MODEL_NAME = modelName;
+      MODEL_NAME_DISPLAY = modelInfo[modelName] ? modelInfo[modelName].name : getModelDisplayName(modelName);
+      updateCurrentModelDisplay();
+      showNotification('Model set: ' + MODEL_NAME_DISPLAY);
+    } else {
+      showNotification('Please select a valid model');
+    }
+  });
+}
     
     // Improved Chain of Draft word limit options UI
     function updateCoDOptionsUI() {
